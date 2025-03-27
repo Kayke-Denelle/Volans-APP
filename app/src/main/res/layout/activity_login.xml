@@ -2,41 +2,140 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="32dp"
+    android:background="#352396"
     tools:context=".LoginActivity">
+
+    <!-- Logo centralizada verticalmente -->
+    <ImageView
+        android:id="@+id/logoImageView"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="80dp"
+        android:src="@drawable/logo_volans"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/usernameLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
+
+    <!-- Usuário -->
+    <TextView
+        android:id="@+id/usernameLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Usuário"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/logoImageView"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <EditText
         android:id="@+id/usernameEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="120dp"
-        android:hint="Username"
+        android:layout_marginTop="4dp"
+        android:hint="Usuário"
         android:inputType="text"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp" />
+        android:textColor="#000000"
+        android:textColorHint="#808080"
+        android:background="@drawable/edittext_border"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/usernameLabel"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Senha -->
+    <TextView
+        android:id="@+id/passwordLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Senha"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/usernameEditText"
+        app:layout_constraintStart_toStartOf="parent"/>
 
     <EditText
         android:id="@+id/passwordEditText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:hint="Password"
+        android:layout_marginTop="4dp"
+        android:hint="Senha"
+        android:background="@drawable/edittext_border"
         android:inputType="textPassword"
-        app:layout_constraintTop_toBottomOf="@+id/usernameEditText"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp" />
+        android:textColor="#000000"
+        android:textColorHint="#808080"
+        android:padding="12dp"
+        app:layout_constraintTop_toBottomOf="@+id/passwordLabel"
+        app:layout_constraintStart_toStartOf="parent"/>
 
+    <!-- Botão Login -->
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
         android:text="Login"
+        android:textColor="#FFFFFF"
+        android:textAllCaps="false"
+        android:background="@drawable/rounded_button"
+        android:textSize="16sp"
+        android:padding="12dp"
         app:layout_constraintTop_toBottomOf="@+id/passwordEditText"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp" />
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Esqueceu a senha -->
+    <TextView
+        android:id="@+id/forgotPasswordLink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Esqueceu a senha?"
+        android:textColor="#fff"
+        android:textSize="14sp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/loginButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Espaço flexível para empurrar o conteúdo para baixo -->
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/forgotPasswordLink"
+        app:layout_constraintBottom_toTopOf="@+id/newUserLabel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Novo por aqui - agora no final da tela -->
+    <TextView
+        android:id="@+id/newUserLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Novo por aqui?"
+        android:textColor="#ffffff"
+        android:textSize="14sp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/register_link"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Comece já - no final da tela -->
+    <Button
+        android:id="@+id/register_link"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comece já!"
+        android:textColor="#fff"
+        android:background="@android:color/transparent"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
