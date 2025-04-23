@@ -7,18 +7,60 @@
     android:layout_height="match_parent"
     tools:context=".DashboardActivity">
 
+    <EditText
+        android:id="@+id/etNomeBaralho"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="52dp"
+        android:hint="Nome do baralho"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <EditText
+        android:id="@+id/etDescricaoBaralho"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:hint="Descrição"
+        app:layout_constraintTop_toBottomOf="@+id/etNomeBaralho"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <Button
+        android:id="@+id/btnCriarBaralho"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="Criar Baralho"
+        app:layout_constraintTop_toBottomOf="@+id/etDescricaoBaralho"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvBaralhos"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="68dp"
+        android:layout_weight="1"
+        app:layout_constraintTop_toBottomOf="@+id/btnCriarBaralho"
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="0dp" />
+
     <Button
         android:id="@+id/logoutButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="312dp"
         android:background="@color/design_default_color_primary"
         android:elevation="4dp"
         android:padding="12dp"
         android:text="Logout"
         android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="0dp" />
+        tools:layout_editor_absoluteX="-16dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitClient {
 
     private static Retrofit retrofit;
-    private static final String BASE_URL = "http://10.0.2.2:8081/";
+    private static final String BASE_URL = "http://10.0.2.2:8080/";
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
@@ -16,5 +16,15 @@ public class RetrofitClient {
                     .build();
         }
         return retrofit;
+    }
+
+    // Para o AuthApi
+    public static AuthApi getAuthApi() {
+        return getRetrofitInstance().create(AuthApi.class);
+    }
+
+    // Para o ApiService de baralho e flashcard
+    public static ApiService getApiService() {
+        return getRetrofitInstance().create(ApiService.class);
     }
 }

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutPrincipal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="20dp"
+    android:padding="30dp"
+    tools:context=".FlashcardActivity">
+
+    <EditText
+        android:id="@+id/etPergunta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite a pergunta" />
+
+    <EditText
+        android:id="@+id/etResposta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Digite a resposta"
+        android:layout_marginTop="8dp" />
+
+    <Button
+        android:id="@+id/btnAdicionarFlashcard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Adicionar Flashcard"
+        android:layout_marginTop="8dp" />
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFlashcards"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp"
+        tools:listitem="@layout/item_flashcard" />
+
+    <Button
+        android:id="@+id/btnVoltar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Voltar para os Baralhos"
+        android:layout_marginTop="16dp"
+        android:layout_gravity="center_horizontal"/>
+
+</LinearLayout>
