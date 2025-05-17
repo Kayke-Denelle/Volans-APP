@@ -18,9 +18,8 @@
         <activity
             android:name=".FlashcardActivity"
             android:exported="false" />
-        <activity
-            android:name=".Flashcard"
-            android:exported="false" />
+        <activity android:name=".QuizActivity"
+            android:exported="false"/>
         <activity
             android:name=".DashboardActivity"
             android:exported="false" />
