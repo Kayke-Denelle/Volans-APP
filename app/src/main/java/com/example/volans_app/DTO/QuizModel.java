@@ -1,55 +1,88 @@
 package com.example.volans_app.DTO;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.List;
 
-public class QuizModel {
+public class QuizModel implements Parcelable {
     private String id;
     private String baralhoId;
-    private String pergunta;
-    private List<String> alternativas;
+    private List<QuestaoQuiz> perguntas;  // Alterado para lista de QuestaoQuiz
 
-    private String respostaCorreta;
+    // Construtor vazio
+    public QuizModel() {
+    }
 
-    // Getters
+    // Construtor com todos os campos
+    public QuizModel(String id, String baralhoId, List<QuestaoQuiz> perguntas) {
+        this.id = id;
+        this.baralhoId = baralhoId;
+        this.perguntas = perguntas;
+    }
+
+    // Getters e Setters
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getBaralhoId() {
         return baralhoId;
     }
 
-    public String getPergunta() {
-        return pergunta;
-    }
-
-    public List<String> getAlternativas() {
-        return alternativas;
-    }
-
-    // Setters
-    public void setId(String id) {
-        this.id = id;
-    }
-
     public void setBaralhoId(String baralhoId) {
         this.baralhoId = baralhoId;
     }
 
-    public void setPergunta(String pergunta) {
-        this.pergunta = pergunta;
+    public List<QuestaoQuiz> getPerguntas() {
+        return perguntas;
     }
 
-    public void setAlternativas(List<String> alternativas) {
-        this.alternativas = alternativas;
+    public void setPerguntas(List<QuestaoQuiz> perguntas) {
+        this.perguntas = perguntas;
     }
 
-    public String getRespostaCorreta() {
-        return respostaCorreta;
+    // Implementação Parcelable
+    protected QuizModel(Parcel in) {
+        id = in.readString();
+        baralhoId = in.readString();
+        perguntas = in.createTypedArrayList(QuestaoQuiz.CREATOR);
     }
 
-    public void setRespostaCorreta(String respostaCorreta) {
-        this.respostaCorreta = respostaCorreta;
+    public static final Creator<QuizModel> CREATOR = new Creator<QuizModel>() {
+        @Override
+        public QuizModel createFromParcel(Parcel in) {
+            return new QuizModel(in);
+        }
+
+        @Override
+        public QuizModel[] newArray(int size) {
+            return new QuizModel[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(baralhoId);
+        dest.writeTypedList(perguntas);
+    }
+
+    @Override
+    public String toString() {
+        return "QuizModel{" +
+                "id='" + id + '\'' +
+                ", baralhoId='" + baralhoId + '\'' +
+                ", perguntas=" + perguntas +
+                '}';
     }
 }
-

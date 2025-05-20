@@ -4,6 +4,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="background">#F5F5F5</color>
     <color name="text_primary">#212121</color>
-    <color name="button_primary">#6200EE</color>
+    <color name="text_secondary">#757575</color>
+    <color name="colorPrimary">#6200EE</color>
     <color name="button_primary_pressed">#3700B3</color>
+    <color name="green">#4CAF50</color>  <!-- Verde padrão do Material Design -->
+    <color name="red">#F44336</color>    <!-- Vermelho padrão do Material Design -->
 </resources>

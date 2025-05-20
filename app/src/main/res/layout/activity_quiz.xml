@@ -1,53 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:background="@color/background">
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/white">
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/contadorPergunta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="24dp">
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:text="Pergunta 1/1"/>
 
-        <!-- Pergunta -->
-        <TextView
-            android:id="@+id/perguntaTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@color/text_primary"
-            android:layout_marginBottom="24dp"
-            android:lineSpacingMultiplier="1.2"/>
+    <TextView
+        android:id="@+id/perguntaTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        android:text="Qual é a pergunta?"/>
 
-        <!-- Alternativas -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp">
+
         <RadioGroup
             android:id="@+id/alternativasGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:orientation="vertical"
-            android:divider="@drawable/divider"
-            android:showDividers="middle">
+            android:orientation="vertical"/>
+    </ScrollView>
 
-            <!-- RadioButtons serão adicionados dinamicamente -->
-        </RadioGroup>
-
-        <!-- Botão Responder -->
-        <Button
-            android:id="@+id/responderButton"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:text="Responder"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textAllCaps="false"
-            android:stateListAnimator="@null"
-            android:elevation="4dp"
-            app:cornerRadius="8dp"/>
-
-    </LinearLayout>
-</ScrollView>
+    <Button
+        android:id="@+id/botaoAcao"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:text="Próxima Pergunta"
+        android:textColor="@color/white"
+        android:padding="12dp"/>
+</LinearLayout>

@@ -17,17 +17,24 @@ import java.util.List;
 
 public class BaralhoAdapter extends RecyclerView.Adapter<BaralhoAdapter.BaralhoViewHolder> {
 
+    private List<Baralho> lista = new ArrayList<>();
+    private final OnItemClickListener listener;
+
     public interface OnItemClickListener {
-        void onBaralhoClick(Baralho baralho);  // Renomeado para ficar mais claro
+        void onBaralhoClick(Baralho baralho);
         void onQuizClick(Baralho baralho);
     }
 
-    private List<Baralho> lista;
-    private final OnItemClickListener listener;
-
     public BaralhoAdapter(List<Baralho> lista, OnItemClickListener listener) {
-        this.lista = lista != null ? lista : new ArrayList<>();
+        if (lista != null) {
+            this.lista = lista;
+        }
         this.listener = listener;
+    }
+
+    public void setData(List<Baralho> novaLista) {
+        this.lista = new ArrayList<>(novaLista);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -41,7 +48,11 @@ public class BaralhoAdapter extends RecyclerView.Adapter<BaralhoAdapter.BaralhoV
     @Override
     public void onBindViewHolder(@NonNull BaralhoViewHolder holder, int position) {
         Baralho baralho = lista.get(position);
-        holder.bind(baralho, listener);
+        holder.tvNome.setText(baralho.getNome());
+        holder.tvDescricao.setText(baralho.getDescricao());
+
+        holder.btnAcessarBaralho.setOnClickListener(v -> listener.onBaralhoClick(baralho));
+        holder.btnIniciarQuiz.setOnClickListener(v -> listener.onQuizClick(baralho));
     }
 
     @Override
@@ -49,20 +60,9 @@ public class BaralhoAdapter extends RecyclerView.Adapter<BaralhoAdapter.BaralhoV
         return lista.size();
     }
 
-    public void atualizarLista(List<Baralho> novaLista) {
-        this.lista = novaLista != null ? novaLista : new ArrayList<>();
-        notifyDataSetChanged();
-    }
-
-    public Baralho getItem(int position) {
-        return lista.get(position);
-    }
-
     static class BaralhoViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tvNome;
-        private final TextView tvDescricao;
-        private final Button btnAcessarBaralho;
-        private final Button btnIniciarQuiz;
+        TextView tvNome, tvDescricao;
+        Button btnAcessarBaralho, btnIniciarQuiz;
 
         public BaralhoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -71,18 +71,5 @@ public class BaralhoAdapter extends RecyclerView.Adapter<BaralhoAdapter.BaralhoV
             btnAcessarBaralho = itemView.findViewById(R.id.btnAcessarBaralho);
             btnIniciarQuiz = itemView.findViewById(R.id.btnIniciarQuiz);
         }
-
-        public void bind(Baralho baralho, OnItemClickListener listener) {
-            tvNome.setText(baralho.getNome());
-            tvDescricao.setText(baralho.getDescricao());
-
-            // Configuração dos cliques nos botões
-            btnAcessarBaralho.setOnClickListener(v -> listener.onBaralhoClick(baralho));
-            btnIniciarQuiz.setOnClickListener(v -> listener.onQuizClick(baralho));
-
-            // Removemos o clique da view inteira
-        }
     }
-
 }
-

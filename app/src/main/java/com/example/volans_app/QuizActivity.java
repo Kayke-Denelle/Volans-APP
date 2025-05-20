@@ -2,7 +2,6 @@ package com.example.volans_app;
 
 import android.app.AlertDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -15,26 +14,24 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.volans_app.DTO.QuestaoQuiz;
 import com.example.volans_app.DTO.QuizModel;
-import com.example.volans_app.api.ApiService;
-import com.example.volans_app.api.RetrofitClient;
-import com.example.volans_app.utils.SharedPrefManager;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
     private static final String TAG = "QuizActivity";
-    private TextView perguntaTextView;
+    private static final String EXTRA_QUIZ = "quiz";
+
+    // Views
+    private TextView contadorPergunta, perguntaTextView;
     private RadioGroup alternativasGroup;
-    private Button responderButton;
-    private String baralhoId;
-    private String token;
-    private List<QuizModel> quizzes;
+    private Button botaoAcao;
+
+    // Quiz data
+    private QuizModel quiz;
+    private List<QuestaoQuiz> perguntas;
     private int currentQuestionIndex = 0;
     private int correctAnswers = 0;
 
@@ -42,182 +39,209 @@ public class QuizActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
-        Log.d(TAG, "Activity criada");
+        Log.d(TAG, "onCreate: Iniciando QuizActivity");
 
-        // Inicialização dos componentes
+        initViews();
+
+        // Verify intent and data
+        if (!verifyIntentAndData()) {
+            return;
+        }
+
+        // Show first question
+        mostrarPerguntaAtual();
+
+        // Set up button listener
+        setupButtonListener();
+    }
+
+    private void initViews() {
+        contadorPergunta = findViewById(R.id.contadorPergunta);
         perguntaTextView = findViewById(R.id.perguntaTextView);
         alternativasGroup = findViewById(R.id.alternativasGroup);
-        responderButton = findViewById(R.id.responderButton);
-
-        // Obter dados da intent e do SharedPreferences
-        baralhoId = getIntent().getStringExtra("baralhoId");
-        token = SharedPrefManager.getInstance(this).getToken();
-
-        if (token == null || token.isEmpty()) {
-            Log.e(TAG, "Token não encontrado - redirecionando para login");
-            redirectToLogin();
-            return;
-        }
-
-        // Adiciona o prefixo Bearer se não existir
-        if (!token.startsWith("Bearer ")) {
-            token = "Bearer " + token;
-        }
-
-        Log.d(TAG, "Baralho ID: " + baralhoId);
-        Log.d(TAG, "Token formatado: " + token.substring(0, Math.min(token.length(), 15)) + "...");
-
-        criarEIniciarQuiz();
+        botaoAcao = findViewById(R.id.botaoAcao);
     }
 
-    private void redirectToLogin() {
-        SharedPrefManager.getInstance(this).logout();
-        startActivity(new Intent(this, LoginActivity.class));
-        finish();
-    }
+    private boolean verifyIntentAndData() {
+        // Check intent
+        if (getIntent() == null) {
+            Log.e(TAG, "Intent is null");
+            showErrorAndFinish("Erro ao iniciar o quiz");
+            return false;
 
-    private void criarEIniciarQuiz() {
-        // Verificação reforçada do token
-        if (token == null || token.equals("Bearer null") || token.length() < 50) {
-            Log.e(TAG, "Token inválido ou malformado");
-            Toast.makeText(this, "Erro de autenticação. Faça login novamente.", Toast.LENGTH_LONG).show();
-            SharedPrefManager.getInstance(this).logout();
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
         }
 
-        ApiService api = RetrofitClient.getRetrofitInstance().create(ApiService.class);
-        Call<List<QuizModel>> call = api.criarQuiz(token, baralhoId);
+        // Check extras
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            Log.e(TAG, "Extras are null");
+            showErrorAndFinish("Dados do quiz não recebidos");
+            return false;
+        }
 
-        Log.d(TAG, "Enviando requisição com token: " + token.substring(0, 15) + "...");
+        // Get quiz
+        quiz = extras.getParcelable(EXTRA_QUIZ);
+        if (quiz == null) {
+            Log.e(TAG, "Quiz is null");
+            showErrorAndFinish("Quiz inválido");
+            return false;
+        }
 
-        call.enqueue(new Callback<List<QuizModel>>() {
-            @Override
-            public void onResponse(Call<List<QuizModel>> call, Response<List<QuizModel>> response) {
-                if (response.code() == 401) {
-                    handleUnauthorizedError();
-                    return;
-                }
+        // Check questions
+        perguntas = quiz.getPerguntas();
+        if (perguntas == null) {
+            Log.e(TAG, "Questions list is null");
+            showErrorAndFinish("Nenhuma pergunta disponível");
+            return false;
+        }
 
-                // Restante do tratamento...
-            }
+        if (perguntas.isEmpty()) {
+            Log.e(TAG, "Questions list is empty");
+            showErrorAndFinish("Nenhuma pergunta disponível");
+            return false;
+        }
 
-            @Override
-            public void onFailure(Call<List<QuizModel>> call, Throwable t) {
-                Log.e(TAG, "Falha na conexão: " + t.getMessage(), t);
-                runOnUiThread(() ->
-                        Toast.makeText(QuizActivity.this,
-                                "Erro de conexão: " + t.getMessage(),
-                                Toast.LENGTH_LONG).show()
-                );
-            }
-        });
-    }
-
-    private void handleUnauthorizedError() {
-        Log.e(TAG, "Erro 401 - Acesso não autorizado");
-        runOnUiThread(() -> {
-            Toast.makeText(QuizActivity.this,
-                    "Sessão expirada ou inválida. Faça login novamente.",
-                    Toast.LENGTH_LONG).show();
-            SharedPrefManager.getInstance(QuizActivity.this).logout();
-            startActivity(new Intent(QuizActivity.this, LoginActivity.class));
-            finish();
-        });
+        Log.d(TAG, "Quiz loaded with " + perguntas.size() + " questions");
+        return true;
     }
 
     private void mostrarPerguntaAtual() {
-        try {
-            // Limpa alternativas anteriores
-            alternativasGroup.removeAllViews();
+        // Clear previous state
+        alternativasGroup.clearCheck();
+        alternativasGroup.removeAllViews();
 
-            // Obtém a pergunta atual
-            QuizModel perguntaAtual = quizzes.get(currentQuestionIndex);
+        // Get current question
+        QuestaoQuiz perguntaAtual = perguntas.get(currentQuestionIndex);
+        Log.d(TAG, "Showing question: " + perguntaAtual.getEnunciado());
 
-            // Define o texto da pergunta
-            perguntaTextView.setText(perguntaAtual.getPergunta());
-
-            // Verifica se há alternativas
-            if (perguntaAtual.getAlternativas() == null || perguntaAtual.getAlternativas().isEmpty()) {
-                Toast.makeText(this, "Erro: Questão sem alternativas", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Adiciona cada alternativa como RadioButton
-            for (int i = 0; i < perguntaAtual.getAlternativas().size(); i++) {
-                RadioButton radioButton = new RadioButton(new ContextThemeWrapper(this, R.style.QuizRadioButton));
-                radioButton.setText(perguntaAtual.getAlternativas().get(i));
-                radioButton.setId(View.generateViewId()); // ID único
-                radioButton.setLayoutParams(new RadioGroup.LayoutParams(
-                        RadioGroup.LayoutParams.MATCH_PARENT,
-                        RadioGroup.LayoutParams.WRAP_CONTENT
-                ));
-                radioButton.setPadding(32, 32, 32, 32); // Espaçamento maior
-                alternativasGroup.addView(radioButton);
-            }
-
-        } catch (Exception e) {
-            Log.e("QUIZ_ERROR", "Erro ao mostrar pergunta: " + e.getMessage());
-            Toast.makeText(this, "Erro ao carregar pergunta", Toast.LENGTH_SHORT).show();
-        }
+        // Update UI
+        updateQuestionCounter();
+        setQuestionText(perguntaAtual.getEnunciado());
+        addOptionsToRadioGroup(perguntaAtual.getOpcoes());
+        updateButtonText();
     }
 
-    private void verificarResposta() {
-        int selectedId = alternativasGroup.getCheckedRadioButtonId();
-        if (selectedId == -1) {
-            Toast.makeText(this, "Selecione uma alternativa", Toast.LENGTH_SHORT).show();
+    private void updateQuestionCounter() {
+        contadorPergunta.setText(String.format("Pergunta %d/%d",
+                currentQuestionIndex + 1, perguntas.size()));
+    }
+
+    private void setQuestionText(String questionText) {
+        perguntaTextView.setText(questionText);
+    }
+
+    private void addOptionsToRadioGroup(List<String> options) {
+        if (options == null || options.isEmpty()) {
+            Log.w(TAG, "No options available for this question");
             return;
         }
 
-        RadioButton selectedRadioButton = findViewById(selectedId);
-        String respostaSelecionada = selectedRadioButton.getText().toString();
-
-        // Obter a pergunta atual
-        QuizModel currentQuestion = quizzes.get(currentQuestionIndex);
-
-        // Verificar se a resposta está correta
-        if (respostaSelecionada.equals(currentQuestion.getRespostaCorreta())) {
-            correctAnswers++;
-            Log.d(TAG, "Resposta correta! Acertos: " + correctAnswers);
-            Toast.makeText(this, "Resposta correta!", Toast.LENGTH_SHORT).show();
-        } else {
-            Log.d(TAG, "Resposta incorreta. Esperado: " + currentQuestion.getRespostaCorreta());
-            Toast.makeText(this, "Resposta incorreta!", Toast.LENGTH_SHORT).show();
-        }
-
-        // Avançar para a próxima pergunta ou finalizar
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizzes.size()) {
-            mostrarPerguntaAtual();
-        } else {
-            mostrarResultadoFinal();
+        for (String option : options) {
+            if (option != null) {
+                alternativasGroup.addView(createRadioButton(option));
+            }
         }
     }
 
-    private void mostrarResultadoFinal() {
-        String resultado = String.format("Você acertou %d de %d perguntas!", correctAnswers, quizzes.size());
-        Log.d(TAG, resultado);
+    private RadioButton createRadioButton(String text) {
+        RadioButton radioButton = new RadioButton(new ContextThemeWrapper(this, R.style.QuizRadioButton));
+        radioButton.setText(text);
+        radioButton.setId(View.generateViewId());
+        radioButton.setLayoutParams(new RadioGroup.LayoutParams(
+                RadioGroup.LayoutParams.MATCH_PARENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT
+        ));
+        radioButton.setPadding(32, 16, 32, 16);
+        return radioButton;
+    }
+
+    private void updateButtonText() {
+        botaoAcao.setText(currentQuestionIndex == perguntas.size() - 1 ?
+                "Finalizar Quiz" : "Próxima Pergunta");
+    }
+
+    private void setupButtonListener() {
+        botaoAcao.setOnClickListener(v -> {
+            if (!isOptionSelected()) {
+                showToast("Selecione uma alternativa");
+                return;
+            }
+
+            checkAnswer();
+            goToNextQuestion();
+        });
+    }
+
+    private boolean isOptionSelected() {
+        return alternativasGroup.getCheckedRadioButtonId() != -1;
+    }
+
+    private void checkAnswer() {
+        RadioButton selectedRadioButton = findViewById(alternativasGroup.getCheckedRadioButtonId());
+        String selectedAnswer = selectedRadioButton.getText().toString();
+        QuestaoQuiz currentQuestion = perguntas.get(currentQuestionIndex);
+
+        if (selectedAnswer.equals(currentQuestion.getRespostaCorreta())) {
+            correctAnswers++;
+            showToastWithStyle("Resposta correta!", R.style.CorrectAnswerToast);
+        } else {
+            showToastWithStyle(
+                    String.format("Resposta incorreta! A correta era: %s",
+                            currentQuestion.getRespostaCorreta()),
+                    R.style.WrongAnswerToast);
+        }
+    }
+
+    private void goToNextQuestion() {
+        currentQuestionIndex++;
+        if (hasMoreQuestions()) {
+            mostrarPerguntaAtual();
+        } else {
+            showFinalResults();
+        }
+    }
+
+    private boolean hasMoreQuestions() {
+        return currentQuestionIndex < perguntas.size();
+    }
+
+    private void showFinalResults() {
+        double percentageCorrect = (double) correctAnswers / perguntas.size() * 100;
+        String result = String.format(
+                "Você acertou %d de %d perguntas!\n(%.1f%%)",
+                correctAnswers, perguntas.size(), percentageCorrect);
 
         new AlertDialog.Builder(this)
                 .setTitle("Quiz Finalizado")
-                .setMessage(resultado)
+                .setMessage(result)
                 .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
                 .show();
+
+        Log.d(TAG, "Quiz completed. Result: " + result);
     }
 
+    private void showErrorAndFinish(String message) {
+        showToast(message);
+        Log.e(TAG, message);
+        finish();
+    }
 
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+    }
 
-    private String getTokenFromPrefs() {
-        String token = SharedPrefManager.getInstance(this).getToken();
-        if (token == null || token.isEmpty()) {
-            Log.e(TAG, "Token inválido - redirecionando para login");
-            runOnUiThread(() -> {
-                Toast.makeText(this, "Sessão expirada", Toast.LENGTH_SHORT).show();
-                redirectToLogin();
-            });
-            return null;
+    private void showToastWithStyle(String message, int styleRes) {
+        try {
+            Toast toast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+            View view = toast.getView();
+            if (view != null) {
+                view.setBackgroundResource(styleRes);
+            }
+            toast.show();
+        } catch (Exception e) {
+            Log.e(TAG, "Error showing styled toast", e);
+            showToast(message);
         }
-        return token;
     }
 }

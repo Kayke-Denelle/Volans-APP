@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="QuizRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">16dp</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="android:background">@drawable/radio_button_selector</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+    <style name="Widget.AppCompat.Button.Borderless" parent="Base.Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="Widget.AppCompat.Button.Colored" parent="Base.Widget.AppCompat.Button">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:backgroundTint">?attr/colorPrimary</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+    <style name="CorrectAnswerToast" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:background">@drawable/toast_correct_background</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="WrongAnswerToast" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:background">@drawable/toast_wrong_background</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 </resources>

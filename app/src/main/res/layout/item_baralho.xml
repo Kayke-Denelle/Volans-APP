@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="?attr/selectableItemBackground">
+    android:background="?android:attr/selectableItemBackground">
 
     <TextView
         android:id="@+id/tvNome"
@@ -32,7 +32,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="4dp"
-            android:text="Acessar Baralho"/>
+            android:text="Flashcards"
+            style="@style/Widget.AppCompat.Button.Borderless"/>
 
         <Button
             android:id="@+id/btnIniciarQuiz"
@@ -40,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="4dp"
-            android:text="Acessar Quiz"/>
+            android:text="Iniciar Quiz"
+            style="@style/Widget.AppCompat.Button.Colored"/>
     </LinearLayout>
 </LinearLayout>
