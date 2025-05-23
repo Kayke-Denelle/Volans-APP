@@ -12,30 +12,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.volans_app.DTO.Baralho;
 import com.example.volans_app.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class BaralhoAdapter extends RecyclerView.Adapter<BaralhoAdapter.BaralhoViewHolder> {
+public class AtividadeBaralhoAdapter extends RecyclerView.Adapter<AtividadeBaralhoAdapter.BaralhoViewHolder> {
 
     private List<Baralho> baralhos;
-    private OnItemClickListener listener;
-    private boolean somenteQuiz;
+    private OnQuizClickListener listener;
 
-    public interface OnItemClickListener {
-        void onBaralhoClick(Baralho baralho);
+    public interface OnQuizClickListener {
+        void onQuizClick(Baralho baralho);
     }
 
-    public BaralhoAdapter(List<Baralho> baralhos, OnItemClickListener listener, boolean somenteQuiz) {
+    public AtividadeBaralhoAdapter(List<Baralho> baralhos, OnQuizClickListener listener) {
         this.baralhos = baralhos;
         this.listener = listener;
-        this.somenteQuiz = somenteQuiz;
     }
 
     @NonNull
     @Override
     public BaralhoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_baralho, parent, false);
+                .inflate(R.layout.item_baralho_atividade, parent, false); // esse layout tem o botão de Iniciar Quiz
         return new BaralhoViewHolder(view);
     }
 
@@ -45,9 +42,9 @@ public class BaralhoAdapter extends RecyclerView.Adapter<BaralhoAdapter.BaralhoV
         holder.tvNome.setText(baralho.getNome());
         holder.tvDescricao.setText(baralho.getDescricao());
 
-        holder.btnAcessarBaralho.setOnClickListener(v -> {
+        holder.btnIniciarQuiz.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onBaralhoClick(baralho);
+                listener.onQuizClick(baralho);
             }
         });
     }
@@ -59,15 +56,14 @@ public class BaralhoAdapter extends RecyclerView.Adapter<BaralhoAdapter.BaralhoV
 
     public static class BaralhoViewHolder extends RecyclerView.ViewHolder {
         TextView tvNome, tvDescricao;
-        Button btnAcessarBaralho;
+        Button btnIniciarQuiz;
 
         public BaralhoViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvNome = itemView.findViewById(R.id.tvNome);
-            tvDescricao = itemView.findViewById(R.id.tvDescricao);
-            btnAcessarBaralho = itemView.findViewById(R.id.btnAcessarBaralho);
+            tvNome = itemView.findViewById(R.id.tvNomeBaralho);
+            tvDescricao = itemView.findViewById(R.id.tvDescricaoBaralho);
+            btnIniciarQuiz = itemView.findViewById(R.id.btnIniciarQuiz);
         }
     }
 }
-
 

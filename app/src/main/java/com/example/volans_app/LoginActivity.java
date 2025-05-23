@@ -112,13 +112,14 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse authResponse = response.body();
-                    handleSuccessfulLogin(authResponse.getToken());
+                    handleSuccessfulLogin(authResponse.getToken(), authResponse.getUsername());
                 } else {
                     Toast.makeText(LoginActivity.this,
                             "Login falhou! Verifique suas credenciais",
                             Toast.LENGTH_SHORT).show();
                 }
             }
+
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
@@ -130,11 +131,13 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void handleSuccessfulLogin(String token) {
+    private void handleSuccessfulLogin(String token, String username) {
         SharedPrefManager.getInstance(this).saveToken(token);
+        SharedPrefManager.getInstance(this).saveNomeUsuario(username);  // Salva o nome do usuário
         Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
         redirectToDashboard();
     }
+
 
     private void redirectToDashboard() {
         Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);

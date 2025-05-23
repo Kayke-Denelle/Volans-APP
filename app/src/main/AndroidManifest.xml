@@ -14,12 +14,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VolansAPP"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        android:usesCleartextTraffic="true">
+        <activity
+            android:name=".AtividadeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".BaralhoActivity"
+            android:exported="false" />
         <activity
             android:name=".FlashcardActivity"
             android:exported="false" />
-        <activity android:name=".QuizActivity"
-            android:exported="false"/>
+        <activity
+            android:name=".QuizActivity"
+            android:exported="false" />
         <activity
             android:name=".DashboardActivity"
             android:exported="false" />

@@ -11,10 +11,12 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -31,21 +33,51 @@ public interface ApiService {
     Call<Flashcard> criarFlashcard(@Body Flashcard flashcard, @Header("Authorization") String token);
 
     // Listar flashcards de um baralho
-    @GET("api/flashcards/baralho/{baralhoId}")
-    Call<List<Flashcard>> getFlashcardsPorBaralho(@Path("baralhoId") String baralhoId, @Header("Authorization") String token);
+    @GET("api/flashcards")
+    Call<List<Flashcard>> getFlashcardsPorBaralho(@Query("baralhoId") String baralhoId, @Header("Authorization") String token);
 
-    @POST("/api/quizzes/gerar/{baralhoId}")
+    // Gerar quiz
+    @POST("api/quizzes/gerar/{baralhoId}")
     Call<List<QuestaoQuiz>> gerarQuiz(
             @Header("Authorization") String token,
             @Path("baralhoId") String baralhoId
     );
 
-    @POST("/api/quizzes/avaliar")
-    Call<ResultadoQuiz> verificarResposta(@Header("Authorization") String token, @Body QuizRequest requisicao);
+    // Avaliar respostas do quiz
+    @POST("api/quizzes/avaliar")
+    Call<ResultadoQuiz> verificarResposta(
+            @Header("Authorization") String token,
+            @Body QuizRequest requisicao
+    );
 
+    // Buscar quiz por ID
     @GET("api/quizzes/{quizId}")
     Call<QuizModel> buscarQuiz(
             @Header("Authorization") String token,
             @Path("quizId") String quizId
     );
+
+    // ===== NOVOS ENDPOINTS PARA DELETAR =====
+
+    // Deletar quiz por ID
+    @DELETE("api/quizzes/{quizId}")
+    Call<Void> deletarQuiz(
+            @Header("Authorization") String token,
+            @Path("quizId") String quizId
+    );
+
+    // Deletar todos os quizzes de um baralho
+    @DELETE("api/quizzes/baralho/{baralhoId}")
+    Call<Void> deletarQuizzesPorBaralho(
+            @Header("Authorization") String token,
+            @Path("baralhoId") String baralhoId
+    );
+
+    @GET("api/baralhos/quantidade")
+    Call<Integer> getQuantidadeBaralhos(@Header("Authorization") String token);
+
+    @GET("api/baralhos/quantidade-flashcards")
+    Call<Integer> getQuantidadeFlashcards(@Header("Authorization") String token);
+
+
 }

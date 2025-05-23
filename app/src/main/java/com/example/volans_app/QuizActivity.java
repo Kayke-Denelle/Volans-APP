@@ -1,6 +1,7 @@
 package com.example.volans_app;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,8 +17,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.volans_app.DTO.QuestaoQuiz;
 import com.example.volans_app.DTO.QuizModel;
+import com.example.volans_app.api.ApiService;
+import com.example.volans_app.api.RetrofitClient;
+import com.example.volans_app.utils.SharedPrefManager;
 
+import java.io.IOException;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class QuizActivity extends AppCompatActivity {
 
@@ -205,6 +214,68 @@ public class QuizActivity extends AppCompatActivity {
         return currentQuestionIndex < perguntas.size();
     }
 
+
+    private void deletarTodosQuizzesDoBaralho() {
+        // Verificar se temos um baralhoId válido
+        if (quiz == null || quiz.getBaralhoId() == null || quiz.getBaralhoId().isEmpty()) {
+            Log.e(TAG, "ID do baralho inválido");
+            Toast.makeText(this, "Erro: Baralho inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
+        if (token.equals("Bearer ")) {
+            Toast.makeText(this, "Sessão expirada", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        Log.d(TAG, "Iniciando exclusão de todos quizzes do baralho ID: " + quiz.getBaralhoId());
+
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Excluindo todos os quizzes...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        ApiService apiService = RetrofitClient.getApiService();
+        Call<Void> call = apiService.deletarQuizzesPorBaralho(token, quiz.getBaralhoId());
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                progressDialog.dismiss();
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Todos quizzes do baralho excluídos com sucesso");
+                    Toast.makeText(QuizActivity.this,
+                            "Todos os quizzes deste baralho foram excluídos",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ?
+                                response.errorBody().string() : "Sem detalhes";
+                        Log.e(TAG, "Erro ao excluir quizzes - Código: " +
+                                response.code() + " - Erro: " + errorBody);
+                        Toast.makeText(QuizActivity.this,
+                                "Erro ao excluir quizzes",
+                                Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Erro ao ler corpo do erro", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                progressDialog.dismiss();
+                Log.e(TAG, "Falha na requisição: " + t.getMessage());
+                Toast.makeText(QuizActivity.this,
+                        "Falha na conexão ao excluir quizzes",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private void showFinalResults() {
         double percentageCorrect = (double) correctAnswers / perguntas.size() * 100;
         String result = String.format(
@@ -214,12 +285,95 @@ public class QuizActivity extends AppCompatActivity {
         new AlertDialog.Builder(this)
                 .setTitle("Quiz Finalizado")
                 .setMessage(result)
-                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Exclui automaticamente sem perguntar
+                    deletarTodosQuizzesDoBaralho();
+                    finish();
+                })
                 .setCancelable(false)
                 .show();
-
-        Log.d(TAG, "Quiz completed. Result: " + result);
     }
+    private void deletarQuizNoBackend() {
+        String token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
+        if (token.equals("Bearer ")) {
+            Toast.makeText(this, "Sessão expirada", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        if (quiz == null || quiz.getId() == null) {
+            Log.e(TAG, "Quiz ID é nulo");
+            Toast.makeText(this, "Erro: Quiz inválido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d(TAG, "Iniciando exclusão do quiz ID: " + quiz.getId());
+
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Excluindo quiz...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        ApiService apiService = RetrofitClient.getApiService();
+        Call<Void> call = apiService.deletarQuiz(token, quiz.getId());
+
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                progressDialog.dismiss();
+
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Resposta do servidor: Sucesso (HTTP " + response.code() + ")");
+                    Toast.makeText(QuizActivity.this, "Quiz excluído", Toast.LENGTH_SHORT).show();
+
+                    // DEBUG: Verifique no backend se realmente foi excluído
+                    verificarSeQuizFoiExcluido();
+                } else {
+                    try {
+                        String errorBody = response.errorBody() != null ?
+                                response.errorBody().string() : "Sem corpo de erro";
+                        Log.e(TAG, "Erro ao excluir - Código: " + response.code() + " - Erro: " + errorBody);
+                        Toast.makeText(QuizActivity.this, "Erro ao excluir", Toast.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Erro ao ler corpo do erro", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                progressDialog.dismiss();
+                Log.e(TAG, "Falha na requisição: " + t.getMessage());
+                Toast.makeText(QuizActivity.this, "Falha na conexão", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Método adicional para debug
+    private void verificarSeQuizFoiExcluido() {
+        String token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
+        ApiService apiService = RetrofitClient.getApiService();
+
+        apiService.buscarQuiz(token, quiz.getId()).enqueue(new Callback<QuizModel>() {
+            @Override
+            public void onResponse(Call<QuizModel> call, Response<QuizModel> response) {
+                if (response.code() == 404) {
+                    Log.d(TAG, "Quiz realmente não existe mais no servidor (404)");
+                } else if (response.isSuccessful()) {
+                    Log.d(TAG, "O quiz AINDA EXISTE no servidor!");
+                    Toast.makeText(QuizActivity.this,
+                            "Erro: O quiz não foi excluído", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<QuizModel> call, Throwable t) {
+                Log.e(TAG, "Erro ao verificar quiz", t);
+            }
+        });
+    }
+
 
     private void showErrorAndFinish(String message) {
         showToast(message);
@@ -244,4 +398,5 @@ public class QuizActivity extends AppCompatActivity {
             showToast(message);
         }
     }
+
 }

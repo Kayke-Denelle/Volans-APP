@@ -67,28 +67,42 @@ public class FlashcardActivity extends AppCompatActivity {
         });
     }
 
-    // Método para carregar flashcards do servidor
     private void carregarFlashcards() {
         String token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
+        Log.d("FlashcardActivity", "Token: " + token);
+        Log.d("FlashcardActivity", "Baralho ID: " + baralhoId);
 
-        RetrofitClient.getApiService().getFlashcardsPorBaralho(baralhoId, token).enqueue(new Callback<List<Flashcard>>() {
+        Call<List<Flashcard>> call = RetrofitClient.getApiService().getFlashcardsPorBaralho(baralhoId, token);
+        call.enqueue(new Callback<List<Flashcard>>() {
             @Override
             public void onResponse(Call<List<Flashcard>> call, Response<List<Flashcard>> response) {
+                Log.d("FlashcardActivity", "Resposta recebida. Código: " + response.code());
+
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("FlashcardActivity", "Flashcards recebidos: " + response.body().size());
+
                     lista.clear();
                     lista.addAll(response.body());
                     adapter.notifyDataSetChanged();
                 } else {
+                    try {
+                        String erro = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
+                        Log.e("FlashcardActivity", "Erro ao carregar flashcards: " + erro);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     Toast.makeText(FlashcardActivity.this, "Erro ao carregar flashcards", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<List<Flashcard>> call, Throwable t) {
+                Log.e("FlashcardActivity", "Falha na requisição: " + t.getMessage(), t);
                 Toast.makeText(FlashcardActivity.this, "Erro ao carregar flashcards", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
     // Método para adicionar um novo flashcard
     private void adicionarFlashcard() {

@@ -7,6 +7,7 @@ public class SharedPrefManager {
     private static final String SHARED_PREF_NAME = "volans_prefs";
     private static final String KEY_TOKEN = "token";
     private static final String KEY_USER_ID = "user_id";
+    private static final String KEY_NOME_USUARIO = "nome_usuario";
 
     private static SharedPrefManager instance;
     private final SharedPreferences sharedPreferences;
@@ -22,12 +23,12 @@ public class SharedPrefManager {
         return instance;
     }
 
-    // Método para verificar se o usuário está logado
+    // Verificar se está logado
     public boolean isLoggedIn() {
         return sharedPreferences.getString(KEY_TOKEN, null) != null;
     }
 
-    // Métodos para o Token
+    // Token
     public void saveToken(String token) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_TOKEN, token);
@@ -38,7 +39,7 @@ public class SharedPrefManager {
         return sharedPreferences.getString(KEY_TOKEN, null);
     }
 
-    // Métodos para User ID
+    // User ID
     public void saveUserId(String userId) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_USER_ID, userId);
@@ -49,7 +50,19 @@ public class SharedPrefManager {
         return sharedPreferences.getString(KEY_USER_ID, null);
     }
 
-    // Logout
+    // Nome do usuário
+    public void saveNomeUsuario(String nomeUsuario) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("nome_usuario", nomeUsuario);
+        editor.apply();
+    }
+
+
+    public String getNomeUsuario() {
+        return sharedPreferences.getString("nome_usuario", "");
+    }
+
+    // Logout - limpar tudo
     public void logout() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();

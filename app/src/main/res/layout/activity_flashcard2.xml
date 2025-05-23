@@ -1,33 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/layoutPrincipal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:layout_margin="20dp"
-    android:padding="30dp"
-    tools:context=".FlashcardActivity">
+
+
+    tools:context=".FlashcardActivity"
+    android:background="#282828">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="56dp"
+        android:background="#323232"
+        android:title="Baralhos"
+        android:titleTextColor="#FFFFFF"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <EditText
         android:id="@+id/etPergunta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Digite a pergunta" />
+        android:hint="Digite a pergunta"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"/>
 
     <EditText
         android:id="@+id/etResposta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Digite a resposta"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#FFFFFF"/>
 
     <Button
         android:id="@+id/btnAdicionarFlashcard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Adicionar Flashcard"
-        android:layout_marginTop="8dp" />
+        android:layout_marginTop="8dp"
+        android:backgroundTint="#404CCF"/>
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -38,6 +56,7 @@
         android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingBottom="8dp"
+
         tools:listitem="@layout/item_flashcard" />
 
     <Button
@@ -46,6 +65,9 @@
         android:layout_height="wrap_content"
         android:text="Voltar para os Baralhos"
         android:layout_marginTop="16dp"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="#404CCF"/>
+
+
 
 </LinearLayout>

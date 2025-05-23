@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Início" />
+    <item
+        android:id="@+id/nav_baralhos"
+        android:icon="@drawable/ic_baralhos"
+        android:title="Baralhos" />
+    <item
+        android:id="@+id/nav_atividade"
+        android:icon="@drawable/ic_atividade"
+        android:title="Atividade" />
+</menu>
