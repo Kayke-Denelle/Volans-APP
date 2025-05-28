@@ -5,19 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingHorizontal="32dp"
-    android:background="#352396"
+    android:background="#404CCF"
     tools:context=".RegisterActivity">
 
-    <!-- Logo no topo com marginTop de 80dp -->
+    <!-- Logo no topo com marginTop de 53dp -->
     <ImageView
         android:id="@+id/logoImageView"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_marginTop="80dp"
+        android:layout_width="247dp"
+        android:layout_height="247dp"
+        android:layout_marginTop="53dp"
         android:src="@drawable/logo_volans"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"/>
 
     <!-- Container central para os campos -->
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,6 +35,7 @@
             android:id="@+id/usernameLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_bold_ttf"
             android:text="Usuário"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
@@ -46,6 +48,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter_medium_ttf"
+            android:paddingStart="1dp"
             android:hint="Digite seu usuário"
             android:inputType="text"
             android:textColor="#FFFFFF"
@@ -62,6 +66,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Email"
+            android:fontFamily="@font/inter_bold_ttf"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:layout_marginTop="16dp"
@@ -74,6 +79,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter_medium_ttf"
+            android:paddingStart="1dp"
             android:hint="Digite seu email"
             android:inputType="textEmailAddress"
             android:textColor="#FFFFFF"
@@ -89,6 +96,7 @@
             android:id="@+id/passwordLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_bold_ttf"
             android:text="Senha"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
@@ -102,6 +110,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:fontFamily="@font/inter_medium_ttf"
+            android:paddingStart="1dp"
             android:hint="Digite sua senha"
             android:inputType="textPassword"
             android:textColor="#FFFFFF"
@@ -113,20 +123,24 @@
             app:layout_constraintTop_toBottomOf="@+id/passwordLabel"/>
 
         <!-- Botão Registrar -->
-        <Button
-            android:id="@+id/register_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Comece Já!"
-            android:textColor="#FFFFFF"
-            android:textAllCaps="false"
-            android:background="@drawable/rounded_button"
-            android:textSize="16sp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/password_input"/>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/register_button"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:backgroundTint="#FFFFFF"
+                    android:letterSpacing="0.002"
+                    android:fontFamily="@font/inter_bold_ttf"
+                    android:text="Comece Já!"
+                    android:textAllCaps="false"
+                    android:textColor="#404CCF"
+                    android:textSize="20sp"
+                    app:cornerRadius="12dp"
+                    app:elevation="4dp"
+                    android:padding="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/password_input" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Rodapé fixo na parte inferior -->
@@ -151,7 +165,7 @@
 
         <!-- Iniciar sessão -->
         <Button
-            android:id="@+id/loginLink"
+            android:id="@+id/btnLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"

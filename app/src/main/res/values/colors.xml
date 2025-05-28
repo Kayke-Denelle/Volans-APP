@@ -11,5 +11,6 @@
     <color name="red">#F44336</color>    <!-- Vermelho padrão do Material Design -->
     <color name="background_dark">#282828</color>
     <color name="blue">#5566FF</color>
-
+        <color name="volans_blue">#404CCF</color>
+        <color name="volans_white">#FFFFFF</color>
 </resources>

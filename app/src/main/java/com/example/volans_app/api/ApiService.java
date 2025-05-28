@@ -4,7 +4,7 @@ import com.example.volans_app.DTO.Baralho;
 import com.example.volans_app.DTO.Flashcard;
 import com.example.volans_app.DTO.QuestaoQuiz;
 import com.example.volans_app.DTO.QuizModel;
-import com.example.volans_app.DTO.QuizRequest;
+//import com.example.volans_app.DTO.QuizRequest;
 import com.example.volans_app.DTO.ResultadoQuiz;
 
 import java.util.List;
@@ -44,11 +44,11 @@ public interface ApiService {
     );
 
     // Avaliar respostas do quiz
-    @POST("api/quizzes/avaliar")
-    Call<ResultadoQuiz> verificarResposta(
-            @Header("Authorization") String token,
-            @Body QuizRequest requisicao
-    );
+//    @POST("api/quizzes/avaliar")
+//    Call<ResultadoQuiz> verificarResposta(
+//            @Header("Authorization") String token,
+//            @Body QuizRequest requisicao
+//    );
 
     // Buscar quiz por ID
     @GET("api/quizzes/{quizId}")

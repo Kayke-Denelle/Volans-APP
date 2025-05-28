@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#404CCF"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <!-- Espaço superior -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Logo do peixe -->
+    <ImageView
+        android:layout_width="247dp"
+        android:layout_height="247dp"
+        android:layout_gravity="center"
+        android:src="@drawable/logo_volans"
+        android:contentDescription="Logo Volans" />
+
+    <!-- Texto principal -->
+    <TextView
+        android:id="@+id/title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="40dp"
+        android:textSize="38dp"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/inter_medium_ttf"
+        android:gravity="center"
+        android:lineSpacingExtra="-3dp" />
+
+    <!-- Espaço do meio -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <!-- Espaço inferior -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="40dp" />
+
+    <!-- BOTÃO 1: Comece Já! (BRANCO) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnComeceJa"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginBottom="3dp"
+        android:backgroundTint="#FFFFFF"
+        android:fontFamily="@font/inter_bold_ttf"
+        android:text="@string/start_button"
+        android:textAllCaps="false"
+        android:textColor="#404CCF"
+        android:textSize="20sp"
+        app:cornerRadius="12dp" />
+
+    <!-- BOTÃO 2: Login (TRANSPARENTE) -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnLogin"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:backgroundTint="@android:color/transparent"
+        android:fontFamily="@font/inter_medium_ttf"
+        android:letterSpacing="0.030"
+        android:text="@string/login_button"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        app:cornerRadius="12dp"
+        app:strokeColor="#FFFFFF"
+        app:strokeWidth="2dp" />
+
+</LinearLayout>

@@ -14,8 +14,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.VolansAPP"
-        tools:targetApi="31"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:targetApi="31">
+        <activity
+            android:name=".PerfilActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".WelcomeActivity"
+            android:exported="false" />
         <activity
             android:name=".AtividadeActivity"
             android:exported="false" />
@@ -35,7 +44,7 @@
             android:name=".RegisterActivity"
             android:exported="false" /> <!-- LoginActivity será a primeira a rodar -->
         <activity
-            android:name=".LoginActivity"
+            android:name=".SplashActivity"
             android:exported="true"> <!-- Mude para "true" para permitir que a activity seja exportada -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

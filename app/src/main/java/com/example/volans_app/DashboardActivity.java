@@ -3,19 +3,28 @@ package com.example.volans_app;
 import static androidx.core.content.ContextCompat.startActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
+import android.view.WindowManager;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.graphics.Insets;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.example.volans_app.api.ApiService;
 import com.example.volans_app.api.RetrofitClient;
@@ -54,6 +63,14 @@ public class DashboardActivity extends AppCompatActivity {
     private boolean isChatbotLoaded = false;
     private Button btnCriarBaralho, btnMeusBaralhos;
 
+    // Drawer
+    private DrawerLayout drawerLayout;
+    private ImageView profileImageDrawer;
+    private TextView tvNomeUsuarioDrawer;
+
+    // Galeria
+    private static final int PICK_IMAGE_REQUEST = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +85,14 @@ public class DashboardActivity extends AppCompatActivity {
         barChart = findViewById(R.id.barChartRevisoes);
         btnCriarBaralho = findViewById(R.id.btnCriarBaralho);
         btnMeusBaralhos = findViewById(R.id.btnMeusBaralhos);
+
+        // Drawer views
+        drawerLayout = findViewById(R.id.drawer_layout);
+        profileImageDrawer = findViewById(R.id.profileImageDrawer);
+        tvNomeUsuarioDrawer = findViewById(R.id.tvNomeUsuarioDrawer);
+
+        // Configurar drawer
+        setupDrawer();
 
         btnCriarBaralho.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,6 +184,7 @@ public class DashboardActivity extends AppCompatActivity {
             nomeUsuario = "Usuário";
         }
         tvNomeUsuario.setText("Olá, " + nomeUsuario + "!");
+        tvNomeUsuarioDrawer.setText(nomeUsuario);
 
         apiService = RetrofitClient.getApiService();
 
@@ -166,9 +192,89 @@ public class DashboardActivity extends AppCompatActivity {
         configurarGrafico();
     }
 
+    private void setupDrawer() {
+        // Configurar toolbar para abrir drawer
+        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                drawerLayout.closeDrawer(GravityCompat.START);
+            } else {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
+
+        // Configurar clique na foto para abrir galeria
+        profileImageDrawer.setOnClickListener(v -> openImagePicker());
+
+        // Configurar cliques do menu drawer
+        setupDrawerMenuClicks();
+    }
+
+    private void setupDrawerMenuClicks() {
+        // Dashboard
+        findViewById(R.id.drawerMenuDashboard).setOnClickListener(v -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        });
+
+        // Baralhos
+        findViewById(R.id.drawerMenuBaralhos).setOnClickListener(v -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            startActivity(new Intent(this, BaralhoActivity.class));
+        });
+
+        // Atividades
+        findViewById(R.id.drawerMenuAtividades).setOnClickListener(v -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            startActivity(new Intent(this, AtividadeActivity.class));
+        });
+
+        // Meu Perfil
+        findViewById(R.id.drawerMenuPerfil).setOnClickListener(v -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            // Implementar se necessário
+        });
+
+        // Termos
+        findViewById(R.id.drawerMenuTermos).setOnClickListener(v -> {
+            drawerLayout.closeDrawer(GravityCompat.START);
+            // Implementar se necessário
+        });
+
+        // Sair
+        findViewById(R.id.drawerMenuSair).setOnClickListener(v -> {
+            SharedPrefManager.getInstance(this).logout();
+            Intent intent = new Intent(this, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        });
+    }
+
+    private void openImagePicker() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        intent.setType("image/*");
+        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
+            Uri imageUri = data.getData();
+            if (imageUri != null) {
+                profileImageDrawer.setImageURI(imageUri);
+                // Salvar URI da imagem se necessário
+                // SharedPrefManager.getInstance(this).saveProfileImageUri(imageUri.toString());
+            }
+        }
+    }
+
     @Override
     public void onBackPressed() {
-        if (chatContainer.getVisibility() == View.VISIBLE) {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else if (chatContainer.getVisibility() == View.VISIBLE) {
             chatContainer.setVisibility(View.GONE);
         } else if (webView.canGoBack()) {
             webView.goBack();
@@ -264,5 +370,27 @@ public class DashboardActivity extends AppCompatActivity {
         barChart.getLegend().setTextSize(14f);
 
         barChart.invalidate();
+    }
+
+    private void setupStatusBar() {
+        // Remove a flag fullscreen
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        // Torna a status bar transparente
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+        // Permite que o conteúdo vá atrás da status bar
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        );
+
+        // Define ícones da status bar como escuros (para fundo claro) ou claros (para fundo escuro)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    getWindow().getDecorView().getSystemUiVisibility() |
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR  // Para ícones escuros
+            );
+        }
     }
 }

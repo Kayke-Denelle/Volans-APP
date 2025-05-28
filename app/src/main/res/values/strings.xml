@@ -1,3 +1,7 @@
 <resources>
-    <string name="app_name">Volans-APP</string>
+    <string name="app_name">Volans</string>
+    <string name="volans_logo">Logo do Volans</string>
+    <string name="welcome_message">Transforme\nconhecimento\nem hábito.</string>
+    <string name="start_button">Comece Já!</string>
+    <string name="login_button">Login</string>
 </resources>

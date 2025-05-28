@@ -1,34 +1,25 @@
 package com.example.volans_app;
 
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
+import android.graphics.Color; import android.os.Build; import android.os.Bundle; import android.util.Log; import android.view.View; import android.view.WindowManager; import android.widget.Button; import android.widget.EditText; import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.volans_app.api.AuthApi;
-import com.example.volans_app.api.RetrofitClient;
-import com.example.volans_app.DTO.RegisterRequest;
-import com.example.volans_app.DTO.RegisterResponse;
+import com.example.volans_app.api.AuthApi; import com.example.volans_app.api.RetrofitClient; import com.example.volans_app.DTO.RegisterRequest; import com.example.volans_app.DTO.RegisterResponse;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import retrofit2.Call; import retrofit2.Callback; import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        setupStatusBar();
 
         EditText usernameInput = findViewById(R.id.username_input);
         EditText passwordInput = findViewById(R.id.password_input);
         EditText emailInput = findViewById(R.id.email_input);
         Button registerButton = findViewById(R.id.register_button);
-        Button loginLink = findViewById(R.id.loginLink);
+        Button loginLink = findViewById(R.id.btnLogin);
 
         registerButton.setOnClickListener(v -> {
             String username = usernameInput.getText().toString().trim();
@@ -81,5 +72,27 @@ public class RegisterActivity extends AppCompatActivity {
                 Toast.makeText(RegisterActivity.this, "Falha na conexão", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void setupStatusBar() {
+        // Remove a flag fullscreen
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        // Torna a status bar transparente
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+
+        // Permite que o conteúdo vá atrás da status bar
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        );
+
+        // Define ícones da status bar como escuros (para fundo claro) ou claros (para fundo escuro)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    getWindow().getDecorView().getSystemUiVisibility() |
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR  // Para ícones escuros
+            );
+        }
     }
 }
