@@ -10,11 +10,9 @@ Fazer login
 Acessar o chatbot
 
 📦 1. Baixar o APK do App
-Acesse a página de releases do repositório no GitHub.
+Acesse o link do mega e baixe o nosso APP para o mobile.
 
-Encontre a versão mais recente.
-
-Baixe o arquivo chamado volans-app.apk.
+https://mega.nz/folder/3YUgHQqA#mYiKkwItIjBfqunwG7ytJQ
 
 ⚠️ Atenção: Para instalar APKs fora da Play Store, é necessário permitir a instalação de apps de fontes desconhecidas no seu dispositivo Android.
 
