@@ -4,7 +4,9 @@ public class Baralho {
     private String id;
     private String nome;
     private String descricao;
+    private String imagemUrl; // Nova propriedade para a URL da imagem personalizada
 
+    // Construtor vazio
     public Baralho() {}
 
     // Construtor com parâmetros para nome e descrição
@@ -13,7 +15,15 @@ public class Baralho {
         this.descricao = descricao;
     }
 
-    // Getters e setters
+    // Construtor completo com todos os campos
+    public Baralho(String id, String nome, String descricao, String imagemUrl) {
+        this.id = id;
+        this.nome = nome;
+        this.descricao = descricao;
+        this.imagemUrl = imagemUrl;
+    }
+
+    // Getters e setters existentes
     public String getId() {
         return id;
     }
@@ -36,5 +46,25 @@ public class Baralho {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    // Getter e setter para a nova propriedade imagemUrl
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
+    }
+
+    // Método toString atualizado
+    @Override
+    public String toString() {
+        return "Baralho{" +
+                "id='" + id + '\'' +
+                ", nome='" + nome + '\'' +
+                ", descricao='" + descricao + '\'' +
+                ", imagemUrl='" + imagemUrl + '\'' +
+                '}';
     }
 }

@@ -5,7 +5,6 @@
     <color name="background">#F5F5F5</color>
     <color name="text_primary">#212121</color>
     <color name="text_secondary">#757575</color>
-    <color name="colorPrimary">#6200EE</color>
     <color name="button_primary_pressed">#3700B3</color>
     <color name="green">#4CAF50</color>  <!-- Verde padrão do Material Design -->
     <color name="red">#F44336</color>    <!-- Vermelho padrão do Material Design -->
@@ -13,4 +12,13 @@
     <color name="blue">#5566FF</color>
         <color name="volans_blue">#404CCF</color>
         <color name="volans_white">#FFFFFF</color>
+    <color name="card_bg_1">#404CCF</color>
+    <color name="card_bg_2">#00BCD4</color>
+    <color name="card_bg_3">#4CAF50</color>
+    <color name="card_bg_4">#FF5722</color>
+    <color name="card_bg_5">#9C27B0</color>
+    <color name="card_bg_6">#FF9800</color>
+    <color name="colorPrimary">#404CCF</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
 </resources>

@@ -1,10 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Tema base da aplicação - ADICIONADO -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Tema sem ActionBar - ADICIONADO -->
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Seus estilos existentes -->
     <style name="QuizRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="android:textSize">16sp</item>
         <item name="android:minHeight">48dp</item>
         <item name="android:layout_marginBottom">8dp</item>
     </style>
+
     <style name="Widget.AppCompat.Button.Borderless" parent="Base.Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:background">@android:color/transparent</item>
@@ -15,6 +30,7 @@
         <item name="android:backgroundTint">?attr/colorPrimary</item>
         <item name="android:elevation">2dp</item>
     </style>
+
     <style name="CorrectAnswerToast" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="android:background">@drawable/toast_correct_background</item>
         <item name="android:textColor">@color/white</item>
@@ -23,5 +39,42 @@
     <style name="WrongAnswerToast" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="android:background">@drawable/toast_wrong_background</item>
         <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="ModernBottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="itemIconTint">@color/bottom_nav_item_color</item>
+        <item name="itemTextColor">@color/bottom_nav_item_color</item>
+        <item name="itemRippleColor">#33404CCF</item>
+        <item name="itemActiveIndicatorStyle">@style/App.ActiveIndicator</item>
+        <item name="android:background">@drawable/bottom_nav_background</item>
+        <item name="itemPaddingTop">8dp</item>
+        <item name="itemPaddingBottom">8dp</item>
+    </style>
+
+    <style name="App.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:drawable">@drawable/bottom_nav_indicator</item>
+    </style>
+
+    <!-- Estilo do Navigation Drawer - MELHORADO -->
+    <style name="AppTheme.NavigationDrawer">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+    </style>
+
+    <!-- Estilo para o header do drawer - ADICIONADO -->
+    <style name="DrawerHeaderText">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Estilo para o email no header do drawer - ADICIONADO -->
+    <style name="DrawerHeaderEmail">
+        <item name="android:textColor">#CCFFFFFF</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:alpha">0.9</item>
     </style>
 </resources>

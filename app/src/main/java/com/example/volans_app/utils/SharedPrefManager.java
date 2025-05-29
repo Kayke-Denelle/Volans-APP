@@ -8,6 +8,7 @@ public class SharedPrefManager {
     private static final String KEY_TOKEN = "token";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_NOME_USUARIO = "nome_usuario";
+    private static final String KEY_EMAIL_USUARIO = "email_usuario"; // Nova chave para email
 
     private static SharedPrefManager instance;
     private final SharedPreferences sharedPreferences;
@@ -53,13 +54,33 @@ public class SharedPrefManager {
     // Nome do usuário
     public void saveNomeUsuario(String nomeUsuario) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("nome_usuario", nomeUsuario);
+        editor.putString(KEY_NOME_USUARIO, nomeUsuario);
         editor.apply();
     }
 
-
     public String getNomeUsuario() {
-        return sharedPreferences.getString("nome_usuario", "");
+        return sharedPreferences.getString(KEY_NOME_USUARIO, "");
+    }
+
+    // Email do usuário - NOVO
+    public void saveEmailUsuario(String emailUsuario) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_EMAIL_USUARIO, emailUsuario);
+        editor.apply();
+    }
+
+    public String getEmailUsuario() {
+        return sharedPreferences.getString(KEY_EMAIL_USUARIO, "");
+    }
+
+    // Método para salvar dados completos do usuário de uma vez
+    public void saveUserData(String token, String userId, String nomeUsuario, String emailUsuario) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_TOKEN, token);
+        editor.putString(KEY_USER_ID, userId);
+        editor.putString(KEY_NOME_USUARIO, nomeUsuario);
+        editor.putString(KEY_EMAIL_USUARIO, emailUsuario);
+        editor.apply();
     }
 
     // Logout - limpar tudo

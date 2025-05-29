@@ -1,12 +1,30 @@
 package com.example.volans_app;
 
-import android.content.Intent; import android.graphics.Color; import android.os.Build; import android.os.Bundle; import android.util.Log; import android.view.View; import android.view.WindowManager; import android.widget.Button; import android.widget.EditText; import android.widget.ImageView; import android.widget.TextView; import android.widget.Toast;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bumptech.glide.Glide; import com.example.volans_app.api.AuthApi; import com.example.volans_app.api.RetrofitClient; import com.example.volans_app.DTO.LoginRequest; import com.example.volans_app.DTO.AuthResponse; import com.example.volans_app.utils.SharedPrefManager;
+import com.bumptech.glide.Glide;
+import com.example.volans_app.api.AuthApi;
+import com.example.volans_app.api.RetrofitClient;
+import com.example.volans_app.DTO.LoginRequest;
+import com.example.volans_app.DTO.AuthResponse;
+import com.example.volans_app.utils.SharedPrefManager;
 
-import retrofit2.Call; import retrofit2.Callback; import retrofit2.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -26,7 +44,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         setupStatusBar();
-
 
         // Inicializa a logo
         logoImageView = findViewById(R.id.logoImageView);
@@ -71,7 +88,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    // ... (restante dos seus métodos permanece igual) ...
     private void handleLogin() {
         String username = usernameEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
@@ -100,14 +116,21 @@ public class LoginActivity extends AppCompatActivity {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     AuthResponse authResponse = response.body();
-                    handleSuccessfulLogin(authResponse.getToken(), authResponse.getUsername());
+
+                    // Verifica se o username é um email
+                    String email = username;
+                    if (!username.contains("@")) {
+                        // Se não for um email, usa um email padrão baseado no username
+                        email = username + "@volans.app";
+                    }
+
+                    handleSuccessfulLogin(authResponse.getToken(), authResponse.getUsername(), email);
                 } else {
                     Toast.makeText(LoginActivity.this,
                             "Login falhou! Verifique suas credenciais",
                             Toast.LENGTH_SHORT).show();
                 }
             }
-
 
             @Override
             public void onFailure(Call<AuthResponse> call, Throwable t) {
@@ -119,19 +142,25 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void handleSuccessfulLogin(String token, String username) {
+    private void handleSuccessfulLogin(String token, String username, String email) {
+        // Salva todos os dados do usuário
         SharedPrefManager.getInstance(this).saveToken(token);
-        SharedPrefManager.getInstance(this).saveNomeUsuario(username);  // Salva o nome do usuário
+        SharedPrefManager.getInstance(this).saveNomeUsuario(username);
+        SharedPrefManager.getInstance(this).saveEmailUsuario(email);
+
+        // Alternativa: usar o método que salva tudo de uma vez
+        // SharedPrefManager.getInstance(this).saveUserData(token, null, username, email);
+
         Toast.makeText(this, "Login bem-sucedido!", Toast.LENGTH_SHORT).show();
         redirectToDashboard();
     }
-
 
     private void redirectToDashboard() {
         Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
         startActivity(intent);
         finish();
     }
+
     private void setupStatusBar() {
         // Remove a flag fullscreen
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -153,5 +182,4 @@ public class LoginActivity extends AppCompatActivity {
             );
         }
     }
-
 }

@@ -1,273 +1,439 @@
 package com.example.volans_app;
 
-import static androidx.core.content.ContextCompat.startActivity;
-
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.animation.DecelerateInterpolator;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-import androidx.core.graphics.Insets;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.volans_app.api.ApiService;
 import com.example.volans_app.api.RetrofitClient;
 import com.example.volans_app.utils.SharedPrefManager;
-import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BarData;
-import com.github.mikephil.charting.data.BarDataSet;
-import com.github.mikephil.charting.data.BarEntry;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.navigation.NavigationView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private TextView tvQuantidadeBaralhos, tvQuantidadeFlashcards;
     private TextView tvNomeUsuario;
     private ApiService apiService;
-
-    private Button btnLogout;
     private String token;
+    private LineChart lineChart;
 
-    private BarChart barChart;  // Declaração do gráfico
-
-    // Adicionado para o WebView do chatbot
+    // Chatbot
     private WebView webView;
     private FrameLayout chatContainer;
-    private View mainInterface;
     private boolean isChatbotLoaded = false;
-    private Button btnCriarBaralho, btnMeusBaralhos;
 
     // Drawer
     private DrawerLayout drawerLayout;
-    private ImageView profileImageDrawer;
+    private NavigationView navigationView;
+    private ImageButton btnHamburger;
+    private ActionBarDrawerToggle drawerToggle;
     private TextView tvNomeUsuarioDrawer;
+    private TextView tvEmailUsuarioDrawer; // Para exibir email no drawer
 
-    // Galeria
-    private static final int PICK_IMAGE_REQUEST = 1;
+    // Bottom Navigation
+    private BottomNavigationView bottomNavigationView;
+
+    // Schedule
+    private RecyclerView rvSchedule;
+    private ScheduleAdapter scheduleAdapter;
+    private List<ScheduleItem> scheduleList;
+
+    // Quick Actions
+    private View quickActionStudy, quickActionCreate;
+
+    // Classe interna para ScheduleItem
+    public static class ScheduleItem {
+        private String subject;
+        private String professor;
+        private String mode;
+        private String time;
+        private String day;
+        private String deliveryDate;
+        private String deliveryTime;
+
+        public ScheduleItem(String subject, String professor, String mode, String time, String day, String deliveryDate, String deliveryTime) {
+            this.subject = subject;
+            this.professor = professor;
+            this.mode = mode;
+            this.time = time;
+            this.day = day;
+            this.deliveryDate = deliveryDate;
+            this.deliveryTime = deliveryTime;
+        }
+
+        public String getSubject() { return subject; }
+        public String getProfessor() { return professor; }
+        public String getMode() { return mode; }
+        public String getTime() { return time; }
+        public String getDay() { return day; }
+        public String getDeliveryDate() { return deliveryDate; }
+        public String getDeliveryTime() { return deliveryTime; }
+
+        public boolean isDeliveryOverdue() {
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM HH:mm", Locale.getDefault());
+                String deliveryDateTime = deliveryDate + " " + deliveryTime;
+                Date deliveryDateParsed = sdf.parse(deliveryDateTime);
+                Date currentDate = new Date();
+
+                return currentDate.after(deliveryDateParsed);
+            } catch (ParseException e) {
+                return false;
+            }
+        }
+    }
+
+    // Classe interna para ScheduleAdapter
+    public static class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
+
+        private List<ScheduleItem> scheduleList;
+
+        public ScheduleAdapter(List<ScheduleItem> scheduleList) {
+            this.scheduleList = scheduleList;
+        }
+
+        @NonNull
+        @Override
+        public ScheduleViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_schedule, parent, false);
+            return new ScheduleViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
+            ScheduleItem item = scheduleList.get(position);
+            holder.bind(item);
+        }
+
+        @Override
+        public int getItemCount() {
+            return scheduleList.size();
+        }
+
+        static class ScheduleViewHolder extends RecyclerView.ViewHolder {
+            private TextView tvDay, tvTime, tvSubject, tvProfessor, tvMode, tvDeliveryDate;
+
+            public ScheduleViewHolder(@NonNull View itemView) {
+                super(itemView);
+                tvDay = itemView.findViewById(R.id.tvDay);
+                tvTime = itemView.findViewById(R.id.tvTime);
+                tvSubject = itemView.findViewById(R.id.tvSubject);
+                tvProfessor = itemView.findViewById(R.id.tvProfessor);
+                tvMode = itemView.findViewById(R.id.tvMode);
+                tvDeliveryDate = itemView.findViewById(R.id.tvDeliveryDate);
+            }
+
+            public void bind(ScheduleItem item) {
+                tvDay.setText(item.getDay());
+                tvTime.setText(item.getTime());
+                tvSubject.setText(item.getSubject());
+                tvProfessor.setText(item.getProfessor());
+                tvMode.setText(item.getMode());
+
+                String deliveryText = item.getDeliveryDate() + " " + item.getDeliveryTime();
+                tvDeliveryDate.setText(deliveryText);
+
+                if (item.isDeliveryOverdue()) {
+                    tvDeliveryDate.setTextColor(Color.parseColor("#FF5252"));
+                } else {
+                    tvDeliveryDate.setTextColor(Color.parseColor("#404CCF"));
+                }
+
+                itemView.setAlpha(0f);
+                itemView.animate()
+                        .alpha(1f)
+                        .setDuration(300)
+                        .setStartDelay(getAdapterPosition() * 100)
+                        .start();
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Mantém o layout atual do Dashboard
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+
         setContentView(R.layout.activity_dashboard);
 
-        // Inicializar views do dashboard
+        initializeViews();
+        setupDrawer();
+        setupBottomNavigation();
+        setupChatbot();
+        setupButtons();
+        setupSchedule();
+        setupUserData();
+        carregarQuantidades();
+        configurarGraficoLinha();
+        loadScheduleData();
+    }
+
+    private void initializeViews() {
         tvQuantidadeBaralhos = findViewById(R.id.tvQuantidadeBaralhos);
         tvQuantidadeFlashcards = findViewById(R.id.tvQuantidadeFlashcards);
         tvNomeUsuario = findViewById(R.id.tvNomeUsuario);
-        btnLogout = findViewById(R.id.btnLogout);
-        barChart = findViewById(R.id.barChartRevisoes);
-        btnCriarBaralho = findViewById(R.id.btnCriarBaralho);
-        btnMeusBaralhos = findViewById(R.id.btnMeusBaralhos);
+        lineChart = findViewById(R.id.lineChartRevisoes);
 
-        // Drawer views
+        quickActionStudy = findViewById(R.id.quickActionStudy);
+        quickActionCreate = findViewById(R.id.quickActionCreate);
+
         drawerLayout = findViewById(R.id.drawer_layout);
-        profileImageDrawer = findViewById(R.id.profileImageDrawer);
-        tvNomeUsuarioDrawer = findViewById(R.id.tvNomeUsuarioDrawer);
+        navigationView = findViewById(R.id.nav_view);
+        btnHamburger = findViewById(R.id.btnHamburger);
 
-        // Configurar drawer
-        setupDrawer();
-
-        btnCriarBaralho.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DashboardActivity.this, AtividadeActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        btnMeusBaralhos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DashboardActivity.this, BaralhoActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        // Inicializar views do chatbot
         webView = findViewById(R.id.webview);
         chatContainer = findViewById(R.id.chat_container);
-        mainInterface = findViewById(R.id.layoutAcoes);
-        FloatingActionButton chatButton = findViewById(R.id.chat_button);
-        FloatingActionButton closeButton = findViewById(R.id.close_chat_button);
 
-        // Configurar WebView do chatbot
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-        webSettings.setDomStorageEnabled(true);
-        webView.setWebViewClient(new WebViewClient());
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        rvSchedule = findViewById(R.id.rvSchedule);
 
-        // Botão abrir chat
-        chatButton.setOnClickListener(v -> {
-            chatContainer.setVisibility(View.VISIBLE);
-
-            if (!isChatbotLoaded) {
-                webView.loadUrl("https://cdn.botpress.cloud/webchat/v2.4/shareable.html?configUrl=https://files.bpcontent.cloud/2025/04/30/22/20250430222055-KNV4LQWN.json");
-                isChatbotLoaded = true;
-            }
-        });
-
-        // Botão fechar chat
-        closeButton.setOnClickListener(v -> chatContainer.setVisibility(View.GONE));
-
-        // Ajustar padding para EdgeToEdge (se estiver usando)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.layoutAcoes), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        // Configurar BottomNavigation
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_dashboard) {
-                return true; // Já está aqui
-            } else if (itemId == R.id.nav_baralhos) {
-                startActivity(new Intent(DashboardActivity.this, BaralhoActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (itemId == R.id.nav_atividade) {
-                startActivity(new Intent(DashboardActivity.this, AtividadeActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            }
-            return false;
-        });
-
-        // Logout
-        btnLogout.setOnClickListener(v -> {
-            SharedPrefManager.getInstance(DashboardActivity.this).logout();
-            Intent intent = new Intent(DashboardActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
-
-        token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
-
-        if (token.equals("Bearer ")) {
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
-            return;
+        // Inicializar views do header do drawer
+        View headerView = navigationView.getHeaderView(0);
+        if (headerView != null) {
+            tvNomeUsuarioDrawer = headerView.findViewById(R.id.tvNomeUsuarioDrawer);
+            tvEmailUsuarioDrawer = headerView.findViewById(R.id.tvEmailUsuarioDrawer);
         }
-
-        String nomeUsuario = SharedPrefManager.getInstance(this).getNomeUsuario();
-        if (nomeUsuario == null || nomeUsuario.isEmpty()) {
-            nomeUsuario = "Usuário";
-        }
-        tvNomeUsuario.setText("Olá, " + nomeUsuario + "!");
-        tvNomeUsuarioDrawer.setText(nomeUsuario);
-
-        apiService = RetrofitClient.getApiService();
-
-        carregarQuantidades();
-        configurarGrafico();
     }
 
     private void setupDrawer() {
-        // Configurar toolbar para abrir drawer
-        androidx.appcompat.widget.Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(v -> {
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                drawerLayout.closeDrawer(GravityCompat.START);
-            } else {
-                drawerLayout.openDrawer(GravityCompat.START);
-            }
-        });
+        navigationView.setNavigationItemSelectedListener(this);
 
-        // Configurar clique na foto para abrir galeria
-        profileImageDrawer.setOnClickListener(v -> openImagePicker());
+        if (btnHamburger != null) {
+            btnHamburger.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    animateButton(btnHamburger);
 
-        // Configurar cliques do menu drawer
-        setupDrawerMenuClicks();
-    }
-
-    private void setupDrawerMenuClicks() {
-        // Dashboard
-        findViewById(R.id.drawerMenuDashboard).setOnClickListener(v -> {
-            drawerLayout.closeDrawer(GravityCompat.START);
-        });
-
-        // Baralhos
-        findViewById(R.id.drawerMenuBaralhos).setOnClickListener(v -> {
-            drawerLayout.closeDrawer(GravityCompat.START);
-            startActivity(new Intent(this, BaralhoActivity.class));
-        });
-
-        // Atividades
-        findViewById(R.id.drawerMenuAtividades).setOnClickListener(v -> {
-            drawerLayout.closeDrawer(GravityCompat.START);
-            startActivity(new Intent(this, AtividadeActivity.class));
-        });
-
-        // Meu Perfil
-        findViewById(R.id.drawerMenuPerfil).setOnClickListener(v -> {
-            drawerLayout.closeDrawer(GravityCompat.START);
-            // Implementar se necessário
-        });
-
-        // Termos
-        findViewById(R.id.drawerMenuTermos).setOnClickListener(v -> {
-            drawerLayout.closeDrawer(GravityCompat.START);
-            // Implementar se necessário
-        });
-
-        // Sair
-        findViewById(R.id.drawerMenuSair).setOnClickListener(v -> {
-            SharedPrefManager.getInstance(this).logout();
-            Intent intent = new Intent(this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        });
-    }
-
-    private void openImagePicker() {
-        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        intent.setType("image/*");
-        startActivityForResult(intent, PICK_IMAGE_REQUEST);
+                    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                        drawerLayout.closeDrawer(GravityCompat.START);
+                    } else {
+                        drawerLayout.openDrawer(GravityCompat.START);
+                    }
+                }
+            });
+        }
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
 
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
-            Uri imageUri = data.getData();
-            if (imageUri != null) {
-                profileImageDrawer.setImageURI(imageUri);
-                // Salvar URI da imagem se necessário
-                // SharedPrefManager.getInstance(this).saveProfileImageUri(imageUri.toString());
-            }
+        drawerLayout.closeDrawer(GravityCompat.START);
+
+        if (id == R.id.nav_dashboard) {
+            return true;
+        } else if (id == R.id.nav_baralhos) {
+            startActivity(new Intent(this, BaralhoActivity.class));
+            return true;
+        } else if (id == R.id.nav_atividades) {
+            startActivity(new Intent(this, AtividadeActivity.class));
+            return true;
+        } else if (id == R.id.nav_configuracoes) {
+            // Implementar navegação para configurações
+            return true;
+        } else if (id == R.id.nav_termos) {
+            // Implementar navegação para termos
+            return true;
+        } else if (id == R.id.nav_sair) {
+            logout();
+            return true;
         }
+
+        return false;
+    }
+
+    private void setupButtons() {
+        if (quickActionStudy != null) {
+            quickActionStudy.setOnClickListener(v -> {
+                animateQuickAction(quickActionStudy);
+                startActivity(new Intent(this, BaralhoActivity.class));
+            });
+        }
+
+        if (quickActionCreate != null) {
+            quickActionCreate.setOnClickListener(v -> {
+                animateQuickAction(quickActionCreate);
+                startActivity(new Intent(this, AtividadeActivity.class));
+            });
+        }
+    }
+
+    private void animateQuickAction(View action) {
+        action.animate()
+                .scaleX(0.95f)
+                .scaleY(0.95f)
+                .setDuration(150)
+                .withEndAction(() -> {
+                    action.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(150)
+                            .start();
+                })
+                .start();
+    }
+
+    private void animateButton(View button) {
+        button.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .setDuration(100)
+                .withEndAction(() -> {
+                    button.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(100)
+                            .start();
+                })
+                .start();
+    }
+
+    private void setupBottomNavigation() {
+        bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                animateBottomNavigationIcon(bottomNavigationView.findViewById(itemId));
+
+                if (itemId == R.id.nav_dashboard) {
+                    return true;
+                } else if (itemId == R.id.nav_baralhos) {
+                    startActivity(new Intent(DashboardActivity.this, BaralhoActivity.class));
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_atividade) {
+                    startActivity(new Intent(DashboardActivity.this, AtividadeActivity.class));
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void animateBottomNavigationIcon(View view) {
+        if (view != null) {
+            ValueAnimator scaleAnimator = ValueAnimator.ofFloat(0.8f, 1.2f, 1.0f);
+            scaleAnimator.setDuration(400);
+            scaleAnimator.setInterpolator(new DecelerateInterpolator());
+            scaleAnimator.addUpdateListener(animation -> {
+                float value = (float) animation.getAnimatedValue();
+                view.setScaleX(value);
+                view.setScaleY(value);
+            });
+            scaleAnimator.start();
+        }
+    }
+
+    private void setupSchedule() {
+        scheduleList = new ArrayList<>();
+        scheduleAdapter = new ScheduleAdapter(scheduleList);
+
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        rvSchedule.setLayoutManager(layoutManager);
+        rvSchedule.setAdapter(scheduleAdapter);
+    }
+
+    private void loadScheduleData() {
+        scheduleList.clear();
+        scheduleList.add(new ScheduleItem("Startup: Final Project", "Eliney Sabino", "EAD", "17:10", "Quinta", "29/05", "19:00"));
+        scheduleList.add(new ScheduleItem("Programação Mobile", "João Silva", "Presencial", "19:00", "Sexta", "15/05", "23:59"));
+        scheduleList.add(new ScheduleItem("Banco de Dados", "Maria Santos", "EAD", "20:30", "Segunda", "02/06", "18:00"));
+        scheduleList.add(new ScheduleItem("Engenharia de Software", "Pedro Costa", "Presencial", "14:00", "Terça", "10/05", "12:00"));
+        scheduleList.add(new ScheduleItem("Análise de Sistemas", "Ana Lima", "EAD", "16:30", "Quarta", "25/05", "20:00"));
+        scheduleList.add(new ScheduleItem("Interface Humano-Computador", "Carlos Mendes", "Presencial", "08:00", "Sábado", "30/05", "14:30"));
+
+        scheduleAdapter.notifyDataSetChanged();
+    }
+
+    private void setupChatbot() {
+        FloatingActionButton chatButton = findViewById(R.id.chat_button);
+        FloatingActionButton closeButton = findViewById(R.id.close_chat_button);
+
+        if (chatButton != null && closeButton != null && webView != null) {
+            WebSettings webSettings = webView.getSettings();
+            webSettings.setJavaScriptEnabled(true);
+            webSettings.setDomStorageEnabled(true);
+            webView.setWebViewClient(new WebViewClient());
+
+            chatButton.setOnClickListener(v -> {
+                animateFAB(chatButton);
+                chatContainer.setVisibility(View.VISIBLE);
+                if (!isChatbotLoaded) {
+                    webView.loadUrl("https://cdn.botpress.cloud/webchat/v2.4/shareable.html?configUrl=https://files.bpcontent.cloud/2025/04/30/22/20250430222055-KNV4LQWN.json");
+                    isChatbotLoaded = true;
+                }
+            });
+
+            closeButton.setOnClickListener(v -> chatContainer.setVisibility(View.GONE));
+        }
+    }
+
+    private void animateFAB(View fab) {
+        fab.animate()
+                .scaleX(0.8f)
+                .scaleY(0.8f)
+                .setDuration(100)
+                .withEndAction(() -> {
+                    fab.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(100)
+                            .start();
+                })
+                .start();
     }
 
     @Override
@@ -283,10 +449,59 @@ public class DashboardActivity extends AppCompatActivity {
         }
     }
 
+    private void setupUserData() {
+        token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
+
+        if (token.equals("Bearer ")) {
+            startActivity(new Intent(this, LoginActivity.class));
+            finish();
+            return;
+        }
+
+        String nomeUsuario = SharedPrefManager.getInstance(this).getNomeUsuario();
+        String emailUsuario = SharedPrefManager.getInstance(this).getEmailUsuario();
+
+        if (nomeUsuario == null || nomeUsuario.isEmpty()) {
+            nomeUsuario = "Usuário";
+        }
+
+        // Atualizar nome no header principal
+        tvNomeUsuario.setText(nomeUsuario + "! 👋");
+
+        // Atualizar nome no header do drawer
+        if (tvNomeUsuarioDrawer != null) {
+            tvNomeUsuarioDrawer.setText(nomeUsuario);
+        }
+
+        // Atualizar email no header do drawer
+        if (tvEmailUsuarioDrawer != null) {
+            if (emailUsuario != null && !emailUsuario.isEmpty()) {
+                tvEmailUsuarioDrawer.setText(emailUsuario);
+            } else {
+                // Se não tiver email salvo, usa o nome de usuário como base
+                String defaultEmail = nomeUsuario.toLowerCase().replace(" ", ".") + "@volans.app";
+                tvEmailUsuarioDrawer.setText(defaultEmail);
+
+                // Salva o email padrão para uso futuro
+                SharedPrefManager.getInstance(this).saveEmailUsuario(defaultEmail);
+            }
+        }
+
+        apiService = RetrofitClient.getApiService();
+    }
+
+    private void logout() {
+        SharedPrefManager.getInstance(this).logout();
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
+    }
+
     private void carregarQuantidades() {
         if (token.equals("Bearer ")) {
-            tvQuantidadeBaralhos.setText("Baralhos: sem token");
-            tvQuantidadeFlashcards.setText("Flashcards: sem token");
+            tvQuantidadeBaralhos.setText("0");
+            tvQuantidadeFlashcards.setText("0");
             return;
         }
 
@@ -294,15 +509,15 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Integer> call, Response<Integer> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    tvQuantidadeBaralhos.setText("" + response.body());
+                    animateCounterUpdate(tvQuantidadeBaralhos, response.body());
                 } else {
-                    tvQuantidadeBaralhos.setText("Baralhos: erro");
+                    tvQuantidadeBaralhos.setText("0");
                 }
             }
 
             @Override
             public void onFailure(Call<Integer> call, Throwable t) {
-                tvQuantidadeBaralhos.setText("Baralhos: falha");
+                tvQuantidadeBaralhos.setText("0");
             }
         });
 
@@ -310,87 +525,91 @@ public class DashboardActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<Integer> call, Response<Integer> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    tvQuantidadeFlashcards.setText("" + response.body());
+                    animateCounterUpdate(tvQuantidadeFlashcards, response.body());
                 } else {
-                    tvQuantidadeFlashcards.setText("Flashcards: erro");
+                    tvQuantidadeFlashcards.setText("0");
                 }
             }
 
             @Override
             public void onFailure(Call<Integer> call, Throwable t) {
-                tvQuantidadeFlashcards.setText("Flashcards: falha");
+                tvQuantidadeFlashcards.setText("0");
             }
         });
     }
 
-    private void configurarGrafico() {
-        List<BarEntry> entradas = new ArrayList<>();
-        entradas.add(new BarEntry(0f, 4));
-        entradas.add(new BarEntry(1f, 7));
-        entradas.add(new BarEntry(2f, 3));
-        entradas.add(new BarEntry(3f, 6));
-        entradas.add(new BarEntry(4f, 8));
+    private void animateCounterUpdate(TextView textView, int targetValue) {
+        ValueAnimator animator = ValueAnimator.ofInt(0, targetValue);
+        animator.setDuration(1000);
+        animator.addUpdateListener(animation -> {
+            textView.setText(String.valueOf(animation.getAnimatedValue()));
+        });
+        animator.start();
+    }
 
-        BarDataSet dataSet = new BarDataSet(entradas, "Quizzes realizados");
-        dataSet.setColor(getResources().getColor(R.color.blue));
-        dataSet.setValueTextColor(android.graphics.Color.WHITE);
-        dataSet.setValueTextSize(14f);
+    private void configurarGraficoLinha() {
+        List<Entry> entries = new ArrayList<>();
+        entries.add(new Entry(0f, 4f));
+        entries.add(new Entry(1f, 7f));
+        entries.add(new Entry(2f, 3f));
+        entries.add(new Entry(3f, 6f));
+        entries.add(new Entry(4f, 8f));
 
-        BarData barData = new BarData(dataSet);
-        barData.setBarWidth(0.9f);
+        LineDataSet dataSet = new LineDataSet(entries, "");
 
-        barChart.setData(barData);
-        barChart.setFitBars(true);
-        barChart.getDescription().setEnabled(false);
-        barChart.setDrawGridBackground(false);
-        barChart.setDrawBarShadow(false);
-        barChart.setDrawValueAboveBar(true);
-        barChart.setBackgroundColor(getResources().getColor(R.color.background_dark));
+        dataSet.setColor(Color.parseColor("#404CCF"));
+        dataSet.setCircleColor(Color.parseColor("#404CCF"));
+        dataSet.setLineWidth(4f);
+        dataSet.setCircleRadius(8f);
+        dataSet.setDrawCircleHole(true);
+        dataSet.setCircleHoleColor(Color.parseColor("#1A1A2E"));
+        dataSet.setCircleHoleRadius(4f);
+        dataSet.setValueTextColor(Color.TRANSPARENT);
+        dataSet.setDrawFilled(true);
+        dataSet.setFillColor(Color.parseColor("#404CCF"));
+        dataSet.setFillAlpha(30);
 
-        XAxis xAxis = barChart.getXAxis();
+        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
+        dataSet.setCubicIntensity(0.2f);
+
+        LineData lineData = new LineData(dataSet);
+        lineChart.setData(lineData);
+
+        lineChart.getDescription().setEnabled(false);
+        lineChart.setDrawGridBackground(false);
+        lineChart.setBackgroundColor(Color.TRANSPARENT);
+        lineChart.setTouchEnabled(true);
+        lineChart.setDragEnabled(true);
+        lineChart.setScaleEnabled(false);
+        lineChart.setPinchZoom(false);
+        lineChart.setDrawBorders(false);
+
+        XAxis xAxis = lineChart.getXAxis();
         final String[] labels = new String[]{"S1", "S2", "S3", "S4", "S5"};
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(android.graphics.Color.WHITE);
-        xAxis.setTextSize(14f);
-        xAxis.setDrawGridLines(true);
-        xAxis.setGridColor(android.graphics.Color.WHITE);
+        xAxis.setTextColor(Color.parseColor("#80FFFFFF"));
+        xAxis.setTextSize(12f);
+        xAxis.setDrawGridLines(false);
+        xAxis.setDrawAxisLine(false);
 
-        barChart.getAxisLeft().setTextColor(android.graphics.Color.WHITE);
-        barChart.getAxisLeft().setTextSize(14f);
-        barChart.getAxisLeft().setDrawGridLines(true);
-        barChart.getAxisLeft().setGridColor(android.graphics.Color.WHITE);
+        lineChart.getAxisLeft().setTextColor(Color.parseColor("#80FFFFFF"));
+        lineChart.getAxisLeft().setTextSize(12f);
+        lineChart.getAxisLeft().setDrawGridLines(true);
+        lineChart.getAxisLeft().setGridColor(Color.parseColor("#1AFFFFFF"));
+        lineChart.getAxisLeft().setDrawAxisLine(false);
 
-        barChart.getAxisRight().setTextColor(android.graphics.Color.WHITE);
-        barChart.getAxisRight().setTextSize(14f);
-        barChart.getAxisRight().setDrawGridLines(false);
+        lineChart.getAxisRight().setEnabled(false);
+        lineChart.getLegend().setEnabled(false);
 
-        barChart.getLegend().setTextColor(android.graphics.Color.WHITE);
-        barChart.getLegend().setTextSize(14f);
-
-        barChart.invalidate();
+        lineChart.animateX(1500);
+        lineChart.invalidate();
     }
 
-    private void setupStatusBar() {
-        // Remove a flag fullscreen
-        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        // Torna a status bar transparente
-        getWindow().setStatusBarColor(Color.TRANSPARENT);
-
-        // Permite que o conteúdo vá atrás da status bar
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
-                        View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        );
-
-        // Define ícones da status bar como escuros (para fundo claro) ou claros (para fundo escuro)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            getWindow().getDecorView().setSystemUiVisibility(
-                    getWindow().getDecorView().getSystemUiVisibility() |
-                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR  // Para ícones escuros
-            );
-        }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
     }
 }

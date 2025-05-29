@@ -11,5 +11,5 @@
     <item
         android:id="@+id/nav_atividade"
         android:icon="@drawable/ic_atividade"
-        android:title="Atividade" />
+        android:title="Atividades" />
 </menu>

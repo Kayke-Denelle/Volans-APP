@@ -1,16 +1,17 @@
 package com.example.volans_app;
 
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,11 +19,11 @@ import com.example.volans_app.DTO.Baralho;
 import com.example.volans_app.DTO.QuestaoQuiz;
 import com.example.volans_app.DTO.QuizModel;
 import com.example.volans_app.adapter.AtividadeBaralhoAdapter;
-import com.example.volans_app.adapter.BaralhoAdapter;
 import com.example.volans_app.api.ApiService;
 import com.example.volans_app.api.RetrofitClient;
 import com.example.volans_app.utils.SharedPrefManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,41 +38,79 @@ public class AtividadeActivity extends AppCompatActivity {
     private AtividadeBaralhoAdapter adapter;
     private List<Baralho> listaBaralhos = new ArrayList<>();
     private String token;
+    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_atividade);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setSelectedItemId(R.id.nav_atividade);
+        // Inicializar views
+        initializeViews();
 
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            if (item.getItemId() == R.id.nav_dashboard) {
-                startActivity(new Intent(this, DashboardActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (item.getItemId() == R.id.nav_baralhos) {
-                startActivity(new Intent(this, BaralhoActivity.class));
-                overridePendingTransition(0, 0);
-                return true;
-            } else if (item.getItemId() == R.id.nav_atividade) {
-                return true;
-            }
-            return false;
-        });
+        // Configurar bottom navigation moderna
+        setupBottomNavigation();
 
-        rvBaralhos = findViewById(R.id.rvBaralhos);
+        // Verificar token
         token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
-
         if (token.isEmpty()) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             return;
         }
 
+        // Configurar RecyclerView e carregar dados
         setupRecyclerView();
         listarBaralhos();
+    }
+
+    private void initializeViews() {
+        rvBaralhos = findViewById(R.id.rvBaralhos);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+    }
+
+    private void setupBottomNavigation() {
+        bottomNavigationView.setSelectedItemId(R.id.nav_atividade);
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+
+                // Animar o ícone selecionado
+                animateBottomNavigationIcon(bottomNavigationView.findViewById(itemId));
+
+                if (itemId == R.id.nav_atividade) {
+                    // Já está na tela de atividades
+                    return true;
+                } else if (itemId == R.id.nav_dashboard) {
+                    startActivity(new Intent(AtividadeActivity.this, DashboardActivity.class));
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
+                    return true;
+                } else if (itemId == R.id.nav_baralhos) {
+                    startActivity(new Intent(AtividadeActivity.this, BaralhoActivity.class));
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                    finish();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void animateBottomNavigationIcon(View view) {
+        if (view != null) {
+            ValueAnimator animator = ValueAnimator.ofFloat(0.8f, 1.0f);
+            animator.setDuration(300);
+            animator.setInterpolator(new DecelerateInterpolator());
+            animator.addUpdateListener(animation -> {
+                float value = (float) animation.getAnimatedValue();
+                view.setScaleX(value);
+                view.setScaleY(value);
+            });
+            animator.start();
+        }
     }
 
     private void setupRecyclerView() {
@@ -83,7 +122,6 @@ public class AtividadeActivity extends AppCompatActivity {
             }
         });
         rvBaralhos.setAdapter(adapter);
-
     }
 
     private void listarBaralhos() {
@@ -91,7 +129,7 @@ public class AtividadeActivity extends AppCompatActivity {
         api.listarBaralhos(token).enqueue(new Callback<List<Baralho>>() {
             @Override
             public void onResponse(Call<List<Baralho>> call, Response<List<Baralho>> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     listaBaralhos.clear();
                     listaBaralhos.addAll(response.body());
                     adapter.notifyDataSetChanged();
@@ -157,4 +195,20 @@ public class AtividadeActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Garantir que o item correto esteja selecionado
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_atividade);
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Navegar para o Dashboard ao pressionar voltar
+        startActivity(new Intent(this, DashboardActivity.class));
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        finish();
+    }
 }
