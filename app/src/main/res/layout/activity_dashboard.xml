@@ -12,342 +12,341 @@
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/dashboard_gradient_background">
+        android:background="#F5F5F5">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
-            android:scrollbars="none">
+            android:scrollbars="none"
+            android:paddingBottom="80dp"
+            android:clipToPadding="false">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingBottom="120dp">
+                android:orientation="vertical">
 
-                <!-- Status Bar Overlay -->
-                <View
-                    android:id="@+id/statusBarOverlay"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:background="@drawable/status_bar_gradient"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="@id/headerCard" />
+                <!-- Header com gradiente roxo -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/purple_gradient_background"
+                    android:orientation="vertical"
+                    android:paddingTop="50dp"
+                    android:paddingBottom="32dp"
+                    android:paddingHorizontal="20dp">
 
-                <!-- Header Premium com Glassmorphism -->
+                    <!-- Top bar com menu - hamburger mais baixo -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="24dp">
+
+                        <ImageButton
+                            android:id="@+id/btnHamburger"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_hamburger"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:contentDescription="Menu"
+                            app:tint="#FFFFFF" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="1dp"
+                            android:layout_weight="1" />
+
+                    </LinearLayout>
+
+                    <!-- Texto de boas-vindas melhorado -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:layout_marginBottom="20dp">
+
+                        <!-- Saudação -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Bem-vindo de volta,"
+                            android:textColor="#FFFFFF"
+                            android:textSize="18sp"
+                            android:alpha="0.9"
+                            android:layout_marginBottom="4dp" />
+
+                        <!-- Nome do usuário em destaque -->
+                        <TextView
+                            android:id="@+id/tvNomeUsuario"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textColor="#FFFFFF"
+                            android:textSize="28sp"
+                            android:fontFamily="@font/inter_bold_ttf"
+                            android:letterSpacing="0.02" />
+
+                        <!-- Linha decorativa sutil que se ajusta ao tamanho do nome -->
+                        <View
+                            android:id="@+id/decorativeLine"
+                            android:layout_width="0dp"
+                            android:layout_height="3dp"
+                            android:background="#FFFFFF"
+                            android:layout_marginTop="8dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Cards simples e limpos -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="24dp">
+
+                    <!-- Card Baralhos -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                            <!-- Título centralizado -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Baralhos"
+                                android:textColor="#6B7280"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp" />
+
+                            <!-- Número centralizado -->
+                            <TextView
+                                android:id="@+id/tvQuantidadeBaralhos"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textColor="#5B4CF5"
+                                android:textSize="36sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Card Atividades -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="120dp"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardBackgroundColor="#FFFFFF"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="16dp">
+
+                            <!-- Título centralizado -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Atividades"
+                                android:textColor="#6B7280"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:layout_marginBottom="8dp" />
+
+                            <!-- Número centralizado -->
+                            <TextView
+                                android:id="@+id/tvQuantidadeFlashcards"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1"
+                                android:textColor="#5B4CF5"
+                                android:textSize="36sp"
+                                android:textStyle="bold" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+
+                <!-- Botão Continuar estudando -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/headerCard"
-                    android:layout_width="0dp"
+                    android:id="@+id/quickActionStudy"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="60dp"
-                    app:cardCornerRadius="24dp"
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#5B4CF5"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/glassmorphism_background"
-                        android:orientation="vertical"
-                        android:padding="24dp">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="20dp">
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                            <!-- Botão Hambúrguer -->
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                app:cardCornerRadius="24dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#1A404CCF">
-
-                                <ImageButton
-                                    android:id="@+id/btnHamburger"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/hamburger"
-                                    android:background="?attr/selectableItemBackgroundBorderless"
-                                    android:scaleType="centerInside"
-                                    android:contentDescription="Menu"
-                                    android:padding="12dp" />
-
-                            </androidx.cardview.widget.CardView>
-
-                            <!-- Texto de boas-vindas - agora ocupa todo o espaço -->
-                            <LinearLayout
-                                android:layout_width="0dp"
+                            <TextView
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="16dp"
-                                android:orientation="vertical">
+                                android:text="Continuar estudando"
+                                android:textColor="#FFFFFF"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Bem-vindo de volta"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="14sp"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:shadowColor="#80000000"
-                                    android:shadowDx="1"
-                                    android:shadowDy="1"
-                                    android:shadowRadius="2" />
-
-                                <TextView
-                                    android:id="@+id/tvNomeUsuario"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Giovanni! 👋"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="28sp"
-                                    android:textStyle="bold"
-                                    android:fontFamily="sans-serif-black"
-                                    android:layout_marginTop="4dp"
-                                    android:shadowColor="#80000000"
-                                    android:shadowDx="1"
-                                    android:shadowDy="1"
-                                    android:shadowRadius="3" />
-
-                            </LinearLayout>
-
-                            <!-- Avatar removido conforme solicitado -->
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="5 cards prontos para revisão"
+                                android:textColor="#FFFFFF"
+                                android:textSize="14sp"
+                                android:alpha="0.8"
+                                android:layout_marginTop="4dp" />
 
                         </LinearLayout>
 
-                        <!-- Stats Row Melhorada -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginTop="24dp">
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardCornerRadius="24dp"
+                            app:cardBackgroundColor="#FFFFFF"
+                            app:cardElevation="0dp">
 
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginEnd="8dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="@android:color/transparent">
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_play"
+                                app:tint="#5B4CF5" />
 
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:gravity="center"
-                                    android:background="@drawable/mini_card_background"
-                                    android:padding="16dp">
-
-                                    <ImageView
-                                        android:layout_width="24dp"
-                                        android:layout_height="24dp"
-                                        android:src="@drawable/ic_baralhos"
-                                        android:layout_marginBottom="8dp" />
-
-                                    <TextView
-                                        android:id="@+id/tvQuantidadeBaralhos"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="1"
-                                        android:textColor="#404CCF"
-                                        android:textSize="24sp"
-                                        android:textStyle="bold"
-                                        android:fontFamily="sans-serif-black" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Baralhos"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="12sp"
-                                        android:fontFamily="sans-serif-medium" />
-
-                                </LinearLayout>
-
-                            </androidx.cardview.widget.CardView>
-
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginHorizontal="4dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="@android:color/transparent">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:gravity="center"
-                                    android:background="@drawable/mini_card_background"
-                                    android:padding="16dp">
-
-                                    <ImageView
-                                        android:layout_width="24dp"
-                                        android:layout_height="24dp"
-                                        android:src="@drawable/ic_atividade"
-                                        android:layout_marginBottom="8dp" />
-
-                                    <TextView
-                                        android:id="@+id/tvQuantidadeFlashcards"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="1"
-                                        android:textColor="#404CCF"
-                                        android:textSize="24sp"
-                                        android:textStyle="bold"
-                                        android:fontFamily="sans-serif-black" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Flashcards"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="12sp"
-                                        android:fontFamily="sans-serif-medium" />
-
-                                </LinearLayout>
-
-                            </androidx.cardview.widget.CardView>
-
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:layout_marginStart="8dp"
-                                app:cardCornerRadius="16dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="@android:color/transparent">
-
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="vertical"
-                                    android:gravity="center"
-                                    android:background="@drawable/mini_card_background"
-                                    android:padding="16dp">
-
-                                    <ImageView
-                                        android:layout_width="24dp"
-                                        android:layout_height="24dp"
-                                        android:src="@drawable/ic_trending_up"
-                                        android:layout_marginBottom="8dp" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="85%"
-                                        android:textColor="#00E676"
-                                        android:textSize="24sp"
-                                        android:textStyle="bold"
-                                        android:fontFamily="sans-serif-black" />
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="Progresso"
-                                        android:textColor="#FFFFFF"
-                                        android:textSize="12sp"
-                                        android:fontFamily="sans-serif-medium" />
-
-                                </LinearLayout>
-
-                            </androidx.cardview.widget.CardView>
-
-                        </LinearLayout>
+                        </androidx.cardview.widget.CardView>
 
                     </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Performance Chart Card -->
+                <!-- Criar novo baralho -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/chartCard"
-                    android:layout_width="0dp"
+                    android:id="@+id/quickActionCreate"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="24dp"
-                    app:cardCornerRadius="24dp"
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#FFFFFF"
                     app:cardElevation="0dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:layout_constraintTop_toBottomOf="@id/headerCard"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    android:clickable="true"
+                    android:focusable="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/glassmorphism_background"
-                        android:orientation="vertical"
-                        android:padding="24dp">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="20dp">
 
                         <LinearLayout
-                            android:layout_width="match_parent"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="20dp">
+                            android:layout_weight="1"
+                            android:orientation="vertical">
 
-                            <LinearLayout
-                                android:layout_width="0dp"
+                            <TextView
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
+                                android:text="Criar novo baralho"
+                                android:textColor="#1F2937"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Performance"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:fontFamily="sans-serif-black"
-                                    android:shadowColor="#80000000"
-                                    android:shadowDx="1"
-                                    android:shadowDy="1"
-                                    android:shadowRadius="2" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Últimas 5 semanas"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="14sp"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:shadowColor="#80000000"
-                                    android:shadowDx="1"
-                                    android:shadowDy="1"
-                                    android:shadowRadius="1" />
-
-                            </LinearLayout>
-
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                app:cardCornerRadius="20dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#1A00E676">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_trending_up" />
-
-                            </androidx.cardview.widget.CardView>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Adicione novos cards para estudar"
+                                android:textColor="#6B7280"
+                                android:textSize="14sp"
+                                android:layout_marginTop="4dp" />
 
                         </LinearLayout>
+
+                        <androidx.cardview.widget.CardView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardCornerRadius="24dp"
+                            app:cardBackgroundColor="#5B4CF5"
+                            app:cardElevation="0dp">
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_add"
+                                app:tint="#FFFFFF" />
+
+                        </androidx.cardview.widget.CardView>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <!-- Gráfico de progresso -->
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Seu progresso"
+                            android:textColor="#1F2937"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="16dp" />
 
                         <com.github.mikephil.charting.charts.LineChart
                             android:id="@+id/lineChartRevisoes"
@@ -358,229 +357,30 @@
 
                 </androidx.cardview.widget.CardView>
 
-                <!-- Quick Actions Melhoradas -->
-                <LinearLayout
-                    android:id="@+id/llQuickActions"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="24dp"
-                    android:orientation="horizontal"
-                    app:layout_constraintTop_toBottomOf="@id/chartCard"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/quickActionStudy"
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="12dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="0dp"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/action_card_gradient_1"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="20dp">
-
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                app:cardCornerRadius="24dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#1AFFFFFF"
-                                android:layout_marginBottom="12dp">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_play_circle" />
-
-                            </androidx.cardview.widget.CardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Estudar"
-                                android:textColor="#FFFFFF"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:fontFamily="sans-serif-black"
-                                android:shadowColor="#80000000"
-                                android:shadowDx="1"
-                                android:shadowDy="1"
-                                android:shadowRadius="2" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Revisar flashcards"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:layout_marginTop="4dp"
-                                android:shadowColor="#80000000"
-                                android:shadowDx="1"
-                                android:shadowDy="1"
-                                android:shadowRadius="1" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/quickActionCreate"
-                        android:layout_width="0dp"
-                        android:layout_height="140dp"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="0dp"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        android:clickable="true"
-                        android:focusable="true">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:background="@drawable/action_card_gradient_2"
-                            android:orientation="vertical"
-                            android:gravity="center"
-                            android:padding="20dp">
-
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="48dp"
-                                android:layout_height="48dp"
-                                app:cardCornerRadius="24dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#1AFFFFFF"
-                                android:layout_marginBottom="12dp">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_add_circle" />
-
-                            </androidx.cardview.widget.CardView>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Criar"
-                                android:textColor="#FFFFFF"
-                                android:textSize="16sp"
-                                android:textStyle="bold"
-                                android:fontFamily="sans-serif-black"
-                                android:shadowColor="#80000000"
-                                android:shadowDx="1"
-                                android:shadowDy="1"
-                                android:shadowRadius="2" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Novo baralho"
-                                android:textColor="#FFFFFF"
-                                android:textSize="12sp"
-                                android:fontFamily="sans-serif-medium"
-                                android:layout_marginTop="4dp"
-                                android:shadowColor="#80000000"
-                                android:shadowDx="1"
-                                android:shadowDy="1"
-                                android:shadowRadius="1" />
-
-                        </LinearLayout>
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-                <!-- Próximas Tarefas Premium -->
+                <!-- Próximas tarefas -->
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/scheduleCard"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="20dp"
-                    android:layout_marginTop="24dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="@android:color/transparent"
-                    app:layout_constraintTop_toBottomOf="@id/llQuickActions"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent">
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    app:cardElevation="0dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/glassmorphism_background"
                         android:orientation="vertical"
-                        android:padding="24dp">
+                        android:padding="20dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="20dp">
-
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical">
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Próximas Tarefas"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="20sp"
-                                    android:textStyle="bold"
-                                    android:fontFamily="sans-serif-black"
-                                    android:shadowColor="#80000000"
-                                    android:shadowDx="1"
-                                    android:shadowDy="1"
-                                    android:shadowRadius="2" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="Não perca nenhuma!"
-                                    android:textColor="#FFFFFF"
-                                    android:textSize="14sp"
-                                    android:fontFamily="sans-serif-medium"
-                                    android:shadowColor="#80000000"
-                                    android:shadowDx="1"
-                                    android:shadowDy="1"
-                                    android:shadowRadius="1" />
-
-                            </LinearLayout>
-
-                            <androidx.cardview.widget.CardView
-                                android:layout_width="40dp"
-                                android:layout_height="40dp"
-                                app:cardCornerRadius="20dp"
-                                app:cardElevation="0dp"
-                                app:cardBackgroundColor="#1A404CCF">
-
-                                <ImageView
-                                    android:layout_width="24dp"
-                                    android:layout_height="24dp"
-                                    android:layout_gravity="center"
-                                    android:src="@drawable/ic_schedule" />
-
-                            </androidx.cardview.widget.CardView>
-
-                        </LinearLayout>
+                            android:text="Próximas tarefas"
+                            android:textColor="#1F2937"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="16dp" />
 
                         <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/rvSchedule"
@@ -596,53 +396,36 @@
 
                 </androidx.cardview.widget.CardView>
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
 
-        <!-- Floating Action Button Premium - REPOSICIONADO PARA DIREITA -->
+        <!-- Floating Action Button para chat -->
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/chat_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginEnd="30dp"
-            android:layout_marginBottom="100dp"
-            android:src="@drawable/ic_chat_bubble"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="90dp"
+            android:src="@drawable/chatbot"
             android:contentDescription="Abrir chatbot"
-            android:elevation="12dp"
-            app:backgroundTint="#404CCF"
-            app:tint="#FFFFFF"
-            app:fabSize="normal"
-            app:borderWidth="0dp" />
+            app:backgroundTint="#5B4CF5"
+            app:tint="#FFFFFF" />
 
-        <!-- Bottom Navigation Ultra Modern - CORRIGIDO PARA MELHOR VISIBILIDADE -->
-        <androidx.cardview.widget.CardView
+        <!-- Bottom Navigation - Fixo no fundo, totalmente branco -->
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="72dp"
             android:layout_gravity="bottom"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="20dp"
-            app:cardCornerRadius="28dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="#1A1A2E">
-
-            <com.google.android.material.bottomnavigation.BottomNavigationView
-                android:id="@+id/bottom_navigation"
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:background="#1A1A2E"
-                app:itemIconTint="@color/bottom_nav_item_color"
-                app:itemTextColor="@color/bottom_nav_item_color"
-                app:itemRippleColor="#33404CCF"
-                app:itemActiveIndicatorStyle="@null"
-                app:itemBackground="@drawable/transparent_background"
-                app:labelVisibilityMode="labeled"
-                app:itemPaddingTop="8dp"
-                app:itemPaddingBottom="8dp"
-                app:menu="@menu/bottom_nav_menu" />
-
-        </androidx.cardview.widget.CardView>
+            android:background="#FFFFFF"
+            app:itemIconTint="@color/bottom_nav_item_color"
+            app:itemTextColor="@color/bottom_nav_item_color"
+            app:itemActiveIndicatorStyle="@null"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/bottom_nav_menu"
+            android:elevation="8dp" />
 
         <!-- Chatbot Container -->
         <FrameLayout
@@ -650,37 +433,37 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="gone"
-            android:layout_marginBottom="100dp"
-            android:elevation="20dp">
+            android:layout_marginBottom="72dp">
 
             <WebView
                 android:id="@+id/webview"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <!-- Botão de fechar chat ajustado -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/close_chat_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
-                android:layout_margin="16dp"
+                android:layout_marginTop="60dp"
+                android:layout_marginEnd="16dp"
                 android:src="@android:drawable/ic_menu_close_clear_cancel"
-                android:contentDescription="Fechar chatbot" />
+                android:contentDescription="Fechar chatbot"
+                app:backgroundTint="#404CCF"
+                app:tint="#FFFFFF" />
 
         </FrameLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <!-- Navigation Drawer Premium -->
+    <!-- Navigation Drawer com estilo personalizado -->
     <com.google.android.material.navigation.NavigationView
         android:id="@+id/nav_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:background="@color/colorPrimary"
-        app:itemTextColor="@android:color/white"
-        app:itemIconTint="@android:color/white"
-        app:itemTextAppearance="@style/AppTheme.NavigationDrawer"
+        style="@style/CustomNavigationView"
         app:headerLayout="@layout/nav_header_main"
         app:menu="@menu/activity_main_drawer" />
 

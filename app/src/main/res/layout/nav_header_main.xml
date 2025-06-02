@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/colorPrimary"
-    android:gravity="bottom"
+    android:gravity="center"
     android:orientation="vertical"
     android:paddingLeft="16dp"
     android:paddingTop="48dp"
@@ -11,24 +12,45 @@
     android:paddingBottom="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
+    <!-- Foto de perfil circular -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/profileImageContainer"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="40dp"
+        app:cardElevation="0dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/profileImage"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_perfil_placeholder"
+            android:contentDescription="Foto de perfil" />
+    </androidx.cardview.widget.CardView>
+
+    <!-- Nome do usuário centralizado -->
     <TextView
         android:id="@+id/tvNomeUsuarioDrawer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:text="Nome do Usuário"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tvEmailUsuarioDrawer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="usuario@volans.app"
+        android:text="Giovanni"
         android:textColor="#FFFFFF"
-        android:alpha="0.9"
-        android:textSize="14sp" />
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/inter_bold_ttf"
+        android:layout_marginBottom="8dp"
+        android:gravity="center" />
+
+    <!-- Linha decorativa branca -->
+    <View
+        android:layout_width="120dp"
+        android:layout_height="3dp"
+        android:background="#FFFFFF"
+        android:layout_marginTop="4dp" />
 
 </LinearLayout>

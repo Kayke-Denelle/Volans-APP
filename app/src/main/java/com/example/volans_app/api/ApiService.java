@@ -31,6 +31,18 @@ public interface ApiService {
     @GET("api/baralhos")
     Call<List<Baralho>> listarBaralhos(@Header("Authorization") String token);
 
+    // ===== NOVOS ENDPOINTS PARA BARALHOS =====
+
+    // Editar baralho
+    @PUT("api/baralhos/{id}")
+    Call<Baralho> editarBaralho(@Path("id") String id, @Body Baralho baralho, @Header("Authorization") String token);
+
+    // Excluir baralho
+    @DELETE("api/baralhos/{id}")
+    Call<Void> excluirBaralho(@Path("id") String id, @Header("Authorization") String token);
+
+    // ===== ENDPOINTS DE FLASHCARDS =====
+
     // Criar flashcard
     @POST("api/flashcards")
     Call<Flashcard> criarFlashcard(@Body Flashcard flashcard, @Header("Authorization") String token);
@@ -38,6 +50,16 @@ public interface ApiService {
     // Listar flashcards de um baralho
     @GET("api/flashcards")
     Call<List<Flashcard>> getFlashcardsPorBaralho(@Query("baralhoId") String baralhoId, @Header("Authorization") String token);
+
+    // Editar flashcard
+    @PUT("api/flashcards/{id}")
+    Call<Flashcard> editarFlashcard(@Path("id") String id, @Body Flashcard flashcard, @Header("Authorization") String token);
+
+    // Excluir flashcard
+    @DELETE("api/flashcards/{id}")
+    Call<Void> excluirFlashcard(@Path("id") String id, @Header("Authorization") String token);
+
+    // ===== ENDPOINTS DE QUIZ =====
 
     // Gerar quiz
     @POST("api/quizzes/gerar/{baralhoId}")
@@ -52,8 +74,6 @@ public interface ApiService {
             @Header("Authorization") String token,
             @Path("quizId") String quizId
     );
-
-    // ===== ENDPOINTS PARA DELETAR =====
 
     // Deletar quiz por ID
     @DELETE("api/quizzes/{quizId}")
@@ -77,7 +97,7 @@ public interface ApiService {
     @GET("api/baralhos/quantidade-flashcards")
     Call<Integer> getQuantidadeFlashcards(@Header("Authorization") String token);
 
-    // ===== NOVOS ENDPOINTS PARA IMAGENS =====
+    // ===== ENDPOINTS PARA IMAGENS =====
 
     /**
      * Upload de imagem para baralho

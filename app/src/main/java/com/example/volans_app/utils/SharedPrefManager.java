@@ -8,7 +8,9 @@ public class SharedPrefManager {
     private static final String KEY_TOKEN = "token";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_NOME_USUARIO = "nome_usuario";
-    private static final String KEY_EMAIL_USUARIO = "email_usuario"; // Nova chave para email
+    private static final String KEY_EMAIL_USUARIO = "email_usuario";
+    private static final String KEY_PROFILE_IMAGE_PATH = "profile_image_path"; // Nova chave para imagem de perfil
+    private static final String KEY_PROFILE_IMAGE_URL = "profile_image_url"; // Para URLs remotas se necessário
 
     private static SharedPrefManager instance;
     private final SharedPreferences sharedPreferences;
@@ -62,7 +64,7 @@ public class SharedPrefManager {
         return sharedPreferences.getString(KEY_NOME_USUARIO, "");
     }
 
-    // Email do usuário - NOVO
+    // Email do usuário
     public void saveEmailUsuario(String emailUsuario) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_EMAIL_USUARIO, emailUsuario);
@@ -73,7 +75,51 @@ public class SharedPrefManager {
         return sharedPreferences.getString(KEY_EMAIL_USUARIO, "");
     }
 
-    // Método para salvar dados completos do usuário de uma vez
+    // ========== MÉTODOS PARA IMAGEM DE PERFIL ==========
+
+    // Salvar caminho da imagem de perfil local
+    public void saveProfileImagePath(String imagePath) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_PROFILE_IMAGE_PATH, imagePath);
+        editor.apply();
+    }
+
+    // Recuperar caminho da imagem de perfil local
+    public String getProfileImagePath() {
+        return sharedPreferences.getString(KEY_PROFILE_IMAGE_PATH, null);
+    }
+
+    // Salvar URL da imagem de perfil remota (se usar servidor)
+    public void saveProfileImageUrl(String imageUrl) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_PROFILE_IMAGE_URL, imageUrl);
+        editor.apply();
+    }
+
+    // Recuperar URL da imagem de perfil remota
+    public String getProfileImageUrl() {
+        return sharedPreferences.getString(KEY_PROFILE_IMAGE_URL, null);
+    }
+
+    // Verificar se existe imagem de perfil (local ou remota)
+    public boolean hasProfileImage() {
+        String localPath = getProfileImagePath();
+        String remoteUrl = getProfileImageUrl();
+        return (localPath != null && !localPath.isEmpty()) ||
+                (remoteUrl != null && !remoteUrl.isEmpty());
+    }
+
+    // Limpar dados da imagem de perfil
+    public void clearProfileImage() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(KEY_PROFILE_IMAGE_PATH);
+        editor.remove(KEY_PROFILE_IMAGE_URL);
+        editor.apply();
+    }
+
+    // ========== MÉTODOS COMBINADOS ==========
+
+    // Método para salvar dados completos do usuário de uma vez (incluindo imagem)
     public void saveUserData(String token, String userId, String nomeUsuario, String emailUsuario) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_TOKEN, token);
@@ -83,10 +129,67 @@ public class SharedPrefManager {
         editor.apply();
     }
 
-    // Logout - limpar tudo
+    // Método para salvar dados completos do usuário incluindo imagem
+    public void saveUserDataWithImage(String token, String userId, String nomeUsuario,
+                                      String emailUsuario, String profileImagePath) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_TOKEN, token);
+        editor.putString(KEY_USER_ID, userId);
+        editor.putString(KEY_NOME_USUARIO, nomeUsuario);
+        editor.putString(KEY_EMAIL_USUARIO, emailUsuario);
+        if (profileImagePath != null && !profileImagePath.isEmpty()) {
+            editor.putString(KEY_PROFILE_IMAGE_PATH, profileImagePath);
+        }
+        editor.apply();
+    }
+
+    // Método para atualizar apenas o perfil do usuário
+    public void updateUserProfile(String nomeUsuario, String emailUsuario, String profileImagePath) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        if (nomeUsuario != null) {
+            editor.putString(KEY_NOME_USUARIO, nomeUsuario);
+        }
+        if (emailUsuario != null) {
+            editor.putString(KEY_EMAIL_USUARIO, emailUsuario);
+        }
+        if (profileImagePath != null) {
+            editor.putString(KEY_PROFILE_IMAGE_PATH, profileImagePath);
+        }
+        editor.apply();
+    }
+
+    // Logout - limpar tudo (incluindo imagem de perfil)
     public void logout() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.apply();
+    }
+
+    // Logout mantendo apenas dados básicos (se necessário)
+    public void logoutKeepingBasicData() {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove(KEY_TOKEN);
+        editor.remove(KEY_USER_ID);
+        // Mantém nome, email e imagem de perfil para próximo login
+        editor.apply();
+    }
+
+    // ========== MÉTODOS UTILITÁRIOS ==========
+
+    // Verificar se todos os dados do usuário estão completos
+    public boolean isUserDataComplete() {
+        return getToken() != null &&
+                getUserId() != null &&
+                !getNomeUsuario().isEmpty() &&
+                !getEmailUsuario().isEmpty();
+    }
+
+    // Obter resumo dos dados do usuário para debug
+    public String getUserDataSummary() {
+        return "Token: " + (getToken() != null ? "✓" : "✗") +
+                ", UserID: " + (getUserId() != null ? "✓" : "✗") +
+                ", Nome: " + (getNomeUsuario().isEmpty() ? "✗" : "✓") +
+                ", Email: " + (getEmailUsuario().isEmpty() ? "✗" : "✓") +
+                ", Imagem: " + (hasProfileImage() ? "✓" : "✗");
     }
 }

@@ -14,23 +14,21 @@
             android:title="Baralhos" />
         <item
             android:id="@+id/nav_atividades"
-            android:icon="@drawable/ic_atividade"
+            android:icon="@drawable/ic_atividades"
             android:title="Atividades" />
+        <!-- Item "Meu Perfil" removido -->
     </group>
 
-    <item android:title="Outros">
+    <item android:title="Outros"
+        android:titleCondensed="Outros">
         <menu>
             <item
-                android:id="@+id/nav_configuracoes"
-                android:icon="@drawable/ic_settings"
-                android:title="Configurações" />
-            <item
                 android:id="@+id/nav_termos"
-                android:icon="@drawable/termos"
+                android:icon="@drawable/ic_termos"
                 android:title="Termos de Uso" />
             <item
                 android:id="@+id/nav_sair"
-                android:icon="@drawable/sair"
+                android:icon="@drawable/ic_sair"
                 android:title="Sair" />
         </menu>
     </item>

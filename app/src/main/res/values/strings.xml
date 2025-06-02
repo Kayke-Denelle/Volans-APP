@@ -6,4 +6,43 @@
     <string name="login_button">Login</string>
     <string name="drawer_open">Abrir menu</string>
     <string name="drawer_close">Fechar menu</string>
+
+    <string name="terms_of_use_content">
+        Termos de Uso – Volans\n
+
+        Seja bem-vindo(a) ao Volans, uma aplicação mobile desenvolvida por estudantes do 5º semestre do curso de Análise e Desenvolvimento de Sistemas, com o objetivo de auxiliar no processo de aprendizagem por meio da técnica de repetição espaçada.\n\n
+
+        Ao utilizar o aplicativo Volans, você concorda com os presentes Termos de Uso. Recomendamos que leia com atenção antes de continuar utilizando a plataforma.\n\n
+
+        1. Aceitação dos Termos\n
+        Ao acessar ou utilizar o Volans, o usuário declara ter lido, compreendido e aceitado estes Termos de Uso. Caso não concorde com algum dos termos, por favor, não utilize o aplicativo.\n\n
+
+        2. Objetivo do Aplicativo\n
+        O Volans tem como finalidade oferecer uma plataforma de apoio aos estudos, baseada em métodos comprovados de aprendizado, especialmente a técnica de repetição espaçada, por meio de baralhos de flashcards personalizados e quizzes.\n\n
+
+        3. Cadastro e Uso da Conta\n
+        Para utilizar todas as funcionalidades, o usuário poderá se cadastrar com informações básicas como nome de usuário e senha.\n
+        O usuário é responsável por manter a confidencialidade dos dados de acesso à sua conta.\n
+        Não é permitido criar contas falsas ou fornecer informações incorretas.\n\n
+
+        4. Responsabilidades do Usuário\n
+        O usuário compromete-se a:\n
+        • Utilizar o Volans apenas para fins educacionais e lícitos;\n
+        • Não usar o aplicativo para disseminar conteúdo ofensivo, ilegal ou que infrinja direitos de terceiros;\n
+        • Não tentar invadir, corromper ou prejudicar o funcionamento do sistema.\n\n
+
+        5. Privacidade e Dados\n
+        Os dados fornecidos pelos usuários são tratados com respeito e privacidade. Informações pessoais são utilizadas exclusivamente para o funcionamento do app e não são compartilhadas com terceiros, exceto quando exigido por lei ou por solicitação judicial.\n\n
+
+        6. Propriedade Intelectual\n
+        Todo o conteúdo, layout, design, logotipo e funcionalidades do Volans são protegidos por direitos autorais. É proibida a reprodução, distribuição ou modificação sem autorização prévia.\n\n
+
+        7. Limitação de Responsabilidade\n
+        O Volans é um projeto acadêmico em constante evolução. Embora tenhamos o compromisso de oferecer uma plataforma estável e útil, não garantimos ausência total de falhas. O uso do aplicativo é de responsabilidade do usuário.\n\n
+
+        8. Alterações nos Termos\n
+        Podemos atualizar estes Termos de Uso periodicamente. Recomendamos que os usuários consultem esta página com frequência. Ao continuar utilizando o aplicativo após modificações, você concorda com os novos termos.\n\n
+
+        Agradecemos por utilizar o Volans e desejamos uma excelente jornada de estudos!
+    </string>
 </resources>

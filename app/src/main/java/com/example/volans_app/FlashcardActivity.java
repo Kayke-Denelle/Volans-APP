@@ -3,8 +3,11 @@ package com.example.volans_app;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +18,7 @@ import com.example.volans_app.DTO.Flashcard;
 import com.example.volans_app.adapter.FlashcardAdapter;
 import com.example.volans_app.api.RetrofitClient;
 import com.example.volans_app.utils.SharedPrefManager;
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,8 +31,12 @@ import retrofit2.Response;
 public class FlashcardActivity extends AppCompatActivity {
 
     private EditText etPergunta, etResposta;
-    private Button btnAdicionarFlashcard, btnVoltar;
+    private Button btnAdicionarFlashcard;
+    private Button btnVoltar;
     private RecyclerView rvFlashcards;
+    private LinearLayout layoutEmptyState;
+    private TextView tvFlashcardCount;
+    private ExtendedFloatingActionButton fabAddFlashcard;
     private FlashcardAdapter adapter;
     private List<Flashcard> lista = new ArrayList<>();
     private String baralhoId;
@@ -39,31 +47,54 @@ public class FlashcardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_flashcard2);
 
         // Inicializando os componentes
-        etPergunta = findViewById(R.id.etPergunta);
-        etResposta = findViewById(R.id.etResposta);
-        btnAdicionarFlashcard = findViewById(R.id.btnAdicionarFlashcard);
-        btnVoltar = findViewById(R.id.btnVoltar); // Referência ao botão Voltar
-        rvFlashcards = findViewById(R.id.rvFlashcards);
+        initializeViews();
+        setupRecyclerView();
+        setupClickListeners();
 
         // Pegando o ID do baralho da Intent
         baralhoId = getIntent().getStringExtra("baralhoId");
 
-        // Configurando o RecyclerView
+        // Carregar os flashcards ao iniciar
+        carregarFlashcards();
+    }
+
+    private void initializeViews() {
+        etPergunta = findViewById(R.id.etPergunta);
+        etResposta = findViewById(R.id.etResposta);
+        btnAdicionarFlashcard = findViewById(R.id.btnAdicionarFlashcard);
+        btnVoltar = findViewById(R.id.btnVoltar);
+        rvFlashcards = findViewById(R.id.rvFlashcards);
+        layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        tvFlashcardCount = findViewById(R.id.tvFlashcardCount);
+        fabAddFlashcard = findViewById(R.id.fabAddFlashcard);
+    }
+
+    private void setupRecyclerView() {
         adapter = new FlashcardAdapter(lista);
         rvFlashcards.setLayoutManager(new LinearLayoutManager(this));
         rvFlashcards.setAdapter(adapter);
+    }
 
-        // Carregar os flashcards ao iniciar
-        carregarFlashcards();
-
+    private void setupClickListeners() {
         // Ação para adicionar flashcard
-        btnAdicionarFlashcard.setOnClickListener(v -> adicionarFlashcard());
+        btnAdicionarFlashcard.setOnClickListener(v -> {
+            animateButton(btnAdicionarFlashcard);
+            adicionarFlashcard();
+        });
 
-        // Ação para voltar para a tela de baralhos
+        // FAB também adiciona flashcard
+        fabAddFlashcard.setOnClickListener(v -> {
+            animateFAB(fabAddFlashcard);
+            // Scroll para o topo para mostrar o formulário
+            findViewById(R.id.etPergunta).requestFocus();
+        });
+
+        // Ação para voltar
         btnVoltar.setOnClickListener(v -> {
-            Intent intent = new Intent(FlashcardActivity.this, DashboardActivity.class); // Ajuste para a Activity dos baralhos
+            animateButton(btnVoltar);
+            Intent intent = new Intent(FlashcardActivity.this, DashboardActivity.class);
             startActivity(intent);
-            finish(); // Finaliza a FlashcardActivity para não deixar ela na pilha de atividades
+            finish();
         });
     }
 
@@ -84,6 +115,7 @@ public class FlashcardActivity extends AppCompatActivity {
                     lista.clear();
                     lista.addAll(response.body());
                     adapter.notifyDataSetChanged();
+                    updateUI();
                 } else {
                     try {
                         String erro = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
@@ -103,11 +135,9 @@ public class FlashcardActivity extends AppCompatActivity {
         });
     }
 
-
-    // Método para adicionar um novo flashcard
     private void adicionarFlashcard() {
-        String pergunta = etPergunta.getText().toString();
-        String resposta = etResposta.getText().toString();
+        String pergunta = etPergunta.getText().toString().trim();
+        String resposta = etResposta.getText().toString().trim();
 
         if (pergunta.isEmpty() || resposta.isEmpty()) {
             Toast.makeText(this, "Preencha todos os campos", Toast.LENGTH_SHORT).show();
@@ -127,9 +157,18 @@ public class FlashcardActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     lista.add(response.body());
                     adapter.notifyItemInserted(lista.size() - 1);
+
+                    // Limpar campos
                     etPergunta.setText("");
                     etResposta.setText("");
-                    Toast.makeText(FlashcardActivity.this, "Flashcard criado com sucesso!", Toast.LENGTH_SHORT).show();
+
+                    // Atualizar UI
+                    updateUI();
+
+                    // Scroll para mostrar o novo item
+                    rvFlashcards.smoothScrollToPosition(lista.size() - 1);
+
+                    Toast.makeText(FlashcardActivity.this, "✨ Flashcard criado com sucesso!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(FlashcardActivity.this, "Erro ao criar flashcard", Toast.LENGTH_SHORT).show();
                 }
@@ -141,5 +180,54 @@ public class FlashcardActivity extends AppCompatActivity {
             }
         });
     }
-}
 
+    private void updateUI() {
+        int count = lista.size();
+
+        // Atualizar contador
+        String countText = count == 0 ? "Nenhum flashcard" :
+                count == 1 ? "1 flashcard" :
+                        count + " flashcards";
+        tvFlashcardCount.setText(countText);
+
+        // Mostrar/esconder estado vazio
+        if (count == 0) {
+            layoutEmptyState.setVisibility(View.VISIBLE);
+            rvFlashcards.setVisibility(View.GONE);
+        } else {
+            layoutEmptyState.setVisibility(View.GONE);
+            rvFlashcards.setVisibility(View.VISIBLE);
+        }
+    }
+
+    // Animações sutis
+    private void animateButton(View button) {
+        button.animate()
+                .scaleX(0.95f)
+                .scaleY(0.95f)
+                .setDuration(100)
+                .withEndAction(() -> {
+                    button.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(100)
+                            .start();
+                })
+                .start();
+    }
+
+    private void animateFAB(View fab) {
+        fab.animate()
+                .scaleX(0.9f)
+                .scaleY(0.9f)
+                .setDuration(150)
+                .withEndAction(() -> {
+                    fab.animate()
+                            .scaleX(1.0f)
+                            .scaleY(1.0f)
+                            .setDuration(150)
+                            .start();
+                })
+                .start();
+    }
+}

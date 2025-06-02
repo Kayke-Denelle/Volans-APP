@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Tema base da aplicação - ADICIONADO -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <!-- Tema base da aplicação -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
     </style>
 
-    <!-- Tema sem ActionBar - ADICIONADO -->
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!-- Seus estilos existentes -->
     <style name="QuizRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
         <item name="android:textSize">16sp</item>
         <item name="android:minHeight">48dp</item>
@@ -55,7 +56,6 @@
         <item name="android:drawable">@drawable/bottom_nav_indicator</item>
     </style>
 
-    <!-- Estilo do Navigation Drawer - MELHORADO -->
     <style name="AppTheme.NavigationDrawer">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">16sp</item>
@@ -64,17 +64,67 @@
         <item name="android:paddingEnd">16dp</item>
     </style>
 
-    <!-- Estilo para o header do drawer - ADICIONADO -->
     <style name="DrawerHeaderText">
         <item name="android:textColor">#FFFFFF</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <!-- Estilo para o email no header do drawer - ADICIONADO -->
     <style name="DrawerHeaderEmail">
         <item name="android:textColor">#CCFFFFFF</item>
         <item name="android:textSize">14sp</item>
         <item name="android:alpha">0.9</item>
+    </style>
+
+    <style name="DrawerSubheaderText">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">@font/inter_bold_ttf</item>
+        <item name="android:alpha">1.0</item>
+    </style>
+
+    <style name="NavigationMenuTextAppearance">
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/inter_medium_ttf</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="CustomNavigationView" parent="Widget.MaterialComponents.NavigationView">
+        <item name="itemTextAppearance">@style/NavigationMenuTextAppearance</item>
+        <item name="subheaderTextAppearance">@style/DrawerSubheaderText</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="itemTextColor">#FFFFFF</item>
+        <item name="itemIconTint">#FFFFFF</item>
+        <item name="subheaderColor">#FFFFFF</item>
+    </style>
+
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowTitleStyle">@style/CustomDialogTitle</item>
+        <item name="android:windowAnimationStyle">@style/CustomDialogAnimation</item>
+    </style>
+
+    <style name="CustomDialogTitle">
+        <item name="android:textColor">#1F2937</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CustomDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+    </style>
+
+    <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">@drawable/popup_menu_background</item>
+        <item name="android:textColor">#1F2937</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">8dp</item>
     </style>
 </resources>

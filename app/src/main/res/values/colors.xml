@@ -10,8 +10,8 @@
     <color name="red">#F44336</color>    <!-- Vermelho padrão do Material Design -->
     <color name="background_dark">#282828</color>
     <color name="blue">#5566FF</color>
-        <color name="volans_blue">#404CCF</color>
-        <color name="volans_white">#FFFFFF</color>
+    <color name="volans_blue">#404CCF</color>
+    <color name="volans_white">#FFFFFF</color>
     <color name="card_bg_1">#404CCF</color>
     <color name="card_bg_2">#00BCD4</color>
     <color name="card_bg_3">#4CAF50</color>
@@ -21,4 +21,16 @@
     <color name="colorPrimary">#404CCF</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="drawer_subheader_text">#FFFFFF</color>
+
+    <!-- Cores adicionais necessárias (apenas as que não existem) -->
+    <color name="background_primary">@color/background</color>
+    <color name="surface_primary">@color/white</color>
+    <color name="primary">@color/volans_blue</color>
+    <color name="accent">@color/green</color>
+    <color name="error">@color/red</color>
+    <color name="text_hint">#9E9E9E</color>
+    <color name="border_light">#E0E0E0</color>
+    <color name="overlay_background">#80000000</color>
+    <color name="nav_item_color">@color/text_secondary</color>
 </resources>

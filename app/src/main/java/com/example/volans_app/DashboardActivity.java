@@ -2,25 +2,38 @@ package com.example.volans_app;
 
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +53,8 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,8 +68,13 @@ import retrofit2.Response;
 
 public class DashboardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int SWIPE_THRESHOLD = 100;
+    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
+
     private TextView tvQuantidadeBaralhos, tvQuantidadeFlashcards;
     private TextView tvNomeUsuario;
+    private View decorativeLine;
     private ApiService apiService;
     private String token;
     private LineChart lineChart;
@@ -68,9 +88,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private ImageButton btnHamburger;
-    private ActionBarDrawerToggle drawerToggle;
     private TextView tvNomeUsuarioDrawer;
-    private TextView tvEmailUsuarioDrawer; // Para exibir email no drawer
+    private ImageView profileImage;
+    private CardView profileImageContainer;
 
     // Bottom Navigation
     private BottomNavigationView bottomNavigationView;
@@ -82,6 +102,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
     // Quick Actions
     private View quickActionStudy, quickActionCreate;
+
+    // Gesture detector para swipe navigation
+    private GestureDetector gestureDetector;
 
     // Classe interna para ScheduleItem
     public static class ScheduleItem {
@@ -196,16 +219,21 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         super.onCreate(savedInstanceState);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.BLACK);
+
+            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            getWindow().getDecorView().setSystemUiVisibility(flags);
         }
 
         setContentView(R.layout.activity_dashboard);
 
         initializeViews();
         setupDrawer();
+        setupProfileImage();
         setupBottomNavigation();
+        setupSwipeNavigation();
         setupChatbot();
         setupButtons();
         setupSchedule();
@@ -219,26 +247,193 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         tvQuantidadeBaralhos = findViewById(R.id.tvQuantidadeBaralhos);
         tvQuantidadeFlashcards = findViewById(R.id.tvQuantidadeFlashcards);
         tvNomeUsuario = findViewById(R.id.tvNomeUsuario);
+        decorativeLine = findViewById(R.id.decorativeLine);
         lineChart = findViewById(R.id.lineChartRevisoes);
-
         quickActionStudy = findViewById(R.id.quickActionStudy);
         quickActionCreate = findViewById(R.id.quickActionCreate);
-
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
         btnHamburger = findViewById(R.id.btnHamburger);
-
         webView = findViewById(R.id.webview);
         chatContainer = findViewById(R.id.chat_container);
-
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         rvSchedule = findViewById(R.id.rvSchedule);
 
-        // Inicializar views do header do drawer
         View headerView = navigationView.getHeaderView(0);
         if (headerView != null) {
             tvNomeUsuarioDrawer = headerView.findViewById(R.id.tvNomeUsuarioDrawer);
-            tvEmailUsuarioDrawer = headerView.findViewById(R.id.tvEmailUsuarioDrawer);
+            profileImage = headerView.findViewById(R.id.profileImage);
+            profileImageContainer = headerView.findViewById(R.id.profileImageContainer);
+        }
+    }
+
+    private void setupSwipeNavigation() {
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if (e1 == null || e2 == null) return false;
+
+                float diffX = e2.getX() - e1.getX();
+                float diffY = e2.getY() - e1.getY();
+
+                // Verificar se é um swipe horizontal (não vertical)
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    // Swipe para a esquerda - ir para Baralhos
+                    if (diffX < -SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        navigateToBaralhos();
+                        return true;
+                    }
+                    // Swipe para a direita - ir para Atividades
+                    else if (diffX > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
+                        navigateToAtividades();
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+
+        // Aplicar gesture detector ao layout principal
+        View mainContent = findViewById(R.id.drawer_layout);
+        if (mainContent != null) {
+            mainContent.setOnTouchListener((v, event) -> {
+                // Só processar swipe se o drawer estiver fechado
+                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    gestureDetector.onTouchEvent(event);
+                }
+                return false;
+            });
+        }
+    }
+
+    private void navigateToBaralhos() {
+        Intent intent = new Intent(this, BaralhoActivity.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.smooth_slide_in_right, R.anim.smooth_slide_out_left);
+        finish();
+    }
+
+    private void navigateToAtividades() {
+        Intent intent = new Intent(this, AtividadeActivity.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.smooth_slide_in_left, R.anim.smooth_slide_out_right);
+        finish();
+    }
+
+    private void setupProfileImage() {
+        if (profileImageContainer != null) {
+            profileImageContainer.setOnClickListener(v -> {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Selecione uma imagem"), PICK_IMAGE_REQUEST);
+            });
+        }
+        loadProfileImage();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri imageUri = data.getData();
+            try {
+                Bitmap bitmap = processImage(imageUri);
+                if (bitmap != null) {
+                    profileImage.setImageBitmap(bitmap);
+                    saveProfileImage(bitmap);
+                }
+            } catch (Exception e) {
+                Toast.makeText(this, "Erro ao processar imagem", Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private Bitmap processImage(Uri imageUri) {
+        try {
+            InputStream imageStream = getContentResolver().openInputStream(imageUri);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(imageStream);
+
+            if (originalBitmap == null) {
+                return null;
+            }
+
+            Bitmap resizedBitmap = resizeBitmap(originalBitmap, 500);
+            return getCircularBitmap(resizedBitmap);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private Bitmap resizeBitmap(Bitmap bitmap, int maxSize) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        float ratio = (float) width / (float) height;
+
+        int newWidth, newHeight;
+        if (width > height) {
+            newWidth = maxSize;
+            newHeight = (int) (maxSize / ratio);
+        } else {
+            newHeight = maxSize;
+            newWidth = (int) (maxSize * ratio);
+        }
+
+        return Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true);
+    }
+
+    private Bitmap getCircularBitmap(Bitmap bitmap) {
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int size = Math.min(width, height);
+
+        Bitmap output = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+
+        float radius = size / 2f;
+        canvas.drawCircle(radius, radius, radius, paint);
+
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
+        int left = (width - size) / 2;
+        int top = (height - size) / 2;
+
+        canvas.drawBitmap(bitmap, new Rect(left, top, left + size, top + size),
+                new Rect(0, 0, size, size), paint);
+
+        return output;
+    }
+
+    private void saveProfileImage(Bitmap bitmap) {
+        try {
+            String filename = "profile_image.png";
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100,
+                    openFileOutput(filename, MODE_PRIVATE));
+            SharedPrefManager.getInstance(this).saveProfileImagePath(filename);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Erro ao salvar imagem", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadProfileImage() {
+        String imagePath = SharedPrefManager.getInstance(this).getProfileImagePath();
+        if (imagePath != null && !imagePath.isEmpty()) {
+            try {
+                Bitmap bitmap = BitmapFactory.decodeStream(openFileInput(imagePath));
+                if (bitmap != null && profileImage != null) {
+                    profileImage.setImageBitmap(bitmap);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -264,22 +459,18 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-
         drawerLayout.closeDrawer(GravityCompat.START);
 
         if (id == R.id.nav_dashboard) {
             return true;
         } else if (id == R.id.nav_baralhos) {
-            startActivity(new Intent(this, BaralhoActivity.class));
+            navigateToBaralhos();
             return true;
         } else if (id == R.id.nav_atividades) {
-            startActivity(new Intent(this, AtividadeActivity.class));
-            return true;
-        } else if (id == R.id.nav_configuracoes) {
-            // Implementar navegação para configurações
+            navigateToAtividades();
             return true;
         } else if (id == R.id.nav_termos) {
-            // Implementar navegação para termos
+            showTermsOfUse();
             return true;
         } else if (id == R.id.nav_sair) {
             logout();
@@ -293,14 +484,14 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         if (quickActionStudy != null) {
             quickActionStudy.setOnClickListener(v -> {
                 animateQuickAction(quickActionStudy);
-                startActivity(new Intent(this, BaralhoActivity.class));
+                navigateToBaralhos();
             });
         }
 
         if (quickActionCreate != null) {
             quickActionCreate.setOnClickListener(v -> {
                 animateQuickAction(quickActionCreate);
-                startActivity(new Intent(this, AtividadeActivity.class));
+                navigateToAtividades();
             });
         }
     }
@@ -347,14 +538,10 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                 if (itemId == R.id.nav_dashboard) {
                     return true;
                 } else if (itemId == R.id.nav_baralhos) {
-                    startActivity(new Intent(DashboardActivity.this, BaralhoActivity.class));
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    finish();
+                    navigateToBaralhos();
                     return true;
                 } else if (itemId == R.id.nav_atividade) {
-                    startActivity(new Intent(DashboardActivity.this, AtividadeActivity.class));
-                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
-                    finish();
+                    navigateToAtividades();
                     return true;
                 }
 
@@ -459,32 +646,22 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         }
 
         String nomeUsuario = SharedPrefManager.getInstance(this).getNomeUsuario();
-        String emailUsuario = SharedPrefManager.getInstance(this).getEmailUsuario();
-
         if (nomeUsuario == null || nomeUsuario.isEmpty()) {
             nomeUsuario = "Usuário";
         }
 
-        // Atualizar nome no header principal
-        tvNomeUsuario.setText(nomeUsuario + "! 👋");
+        tvNomeUsuario.setText(nomeUsuario + "!");
 
-        // Atualizar nome no header do drawer
-        if (tvNomeUsuarioDrawer != null) {
-            tvNomeUsuarioDrawer.setText(nomeUsuario);
+        if (decorativeLine != null) {
+            tvNomeUsuario.post(() -> {
+                ViewGroup.LayoutParams params = decorativeLine.getLayoutParams();
+                params.width = tvNomeUsuario.getWidth();
+                decorativeLine.setLayoutParams(params);
+            });
         }
 
-        // Atualizar email no header do drawer
-        if (tvEmailUsuarioDrawer != null) {
-            if (emailUsuario != null && !emailUsuario.isEmpty()) {
-                tvEmailUsuarioDrawer.setText(emailUsuario);
-            } else {
-                // Se não tiver email salvo, usa o nome de usuário como base
-                String defaultEmail = nomeUsuario.toLowerCase().replace(" ", ".") + "@volans.app";
-                tvEmailUsuarioDrawer.setText(defaultEmail);
-
-                // Salva o email padrão para uso futuro
-                SharedPrefManager.getInstance(this).saveEmailUsuario(defaultEmail);
-            }
+        if (tvNomeUsuarioDrawer != null) {
+            tvNomeUsuarioDrawer.setText(nomeUsuario);
         }
 
         apiService = RetrofitClient.getApiService();
@@ -496,6 +673,35 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    private void showTermsOfUse() {
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_terms_of_use, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomAlertDialog);
+        builder.setView(dialogView);
+        builder.setPositiveButton("Aceitar", (dialog, which) -> dialog.dismiss());
+        builder.setNegativeButton("Fechar", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
+        }
+
+        dialog.show();
+
+        if (dialog.getButton(AlertDialog.BUTTON_POSITIVE) != null) {
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor("#5B4CF5"));
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextSize(16);
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTypeface(null, android.graphics.Typeface.BOLD);
+        }
+
+        if (dialog.getButton(AlertDialog.BUTTON_NEGATIVE) != null) {
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor("#6B7280"));
+            dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextSize(16);
+        }
     }
 
     private void carregarQuantidades() {
@@ -557,16 +763,16 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
         LineDataSet dataSet = new LineDataSet(entries, "");
 
-        dataSet.setColor(Color.parseColor("#404CCF"));
-        dataSet.setCircleColor(Color.parseColor("#404CCF"));
+        dataSet.setColor(Color.parseColor("#5B4CF5"));
+        dataSet.setCircleColor(Color.parseColor("#5B4CF5"));
         dataSet.setLineWidth(4f);
         dataSet.setCircleRadius(8f);
         dataSet.setDrawCircleHole(true);
-        dataSet.setCircleHoleColor(Color.parseColor("#1A1A2E"));
+        dataSet.setCircleHoleColor(Color.parseColor("#FFFFFF"));
         dataSet.setCircleHoleRadius(4f);
         dataSet.setValueTextColor(Color.TRANSPARENT);
         dataSet.setDrawFilled(true);
-        dataSet.setFillColor(Color.parseColor("#404CCF"));
+        dataSet.setFillColor(Color.parseColor("#5B4CF5"));
         dataSet.setFillAlpha(30);
 
         dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
@@ -589,15 +795,15 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-        xAxis.setTextColor(Color.parseColor("#80FFFFFF"));
+        xAxis.setTextColor(Color.parseColor("#6B7280"));
         xAxis.setTextSize(12f);
         xAxis.setDrawGridLines(false);
         xAxis.setDrawAxisLine(false);
 
-        lineChart.getAxisLeft().setTextColor(Color.parseColor("#80FFFFFF"));
+        lineChart.getAxisLeft().setTextColor(Color.parseColor("#6B7280"));
         lineChart.getAxisLeft().setTextSize(12f);
         lineChart.getAxisLeft().setDrawGridLines(true);
-        lineChart.getAxisLeft().setGridColor(Color.parseColor("#1AFFFFFF"));
+        lineChart.getAxisLeft().setGridColor(Color.parseColor("#F3F4F6"));
         lineChart.getAxisLeft().setDrawAxisLine(false);
 
         lineChart.getAxisRight().setEnabled(false);

@@ -10,6 +10,6 @@
         android:title="Baralhos" />
     <item
         android:id="@+id/nav_atividade"
-        android:icon="@drawable/ic_atividade"
+        android:icon="@drawable/ic_atividades"
         android:title="Atividades" />
 </menu>
