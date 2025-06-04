@@ -12,7 +12,7 @@
     <color name="volans_purple">#5B4CF5</color>
     <color name="volans_white">#FFFFFF</color>
 
-    <!-- Cores padrão do Android (necessárias para compatibilidade) -->
+    <!-- Cores padrão do Android -->
     <color name="colorPrimary">@color/primary</color>
     <color name="colorPrimaryDark">@color/primary_dark</color>
     <color name="colorAccent">@color/accent</color>
@@ -23,6 +23,7 @@
     <color name="transparent">#00000000</color>
     <color name="green">#10B981</color>
     <color name="red">#EF4444</color>
+    <color name="blue">#5566FF</color>
 
     <!-- ========== CORES DE FUNDO ========== -->
     <color name="background">#FFFFFF</color>
@@ -30,17 +31,18 @@
     <color name="background_secondary">#F9FAFB</color>
     <color name="surface">#FFFFFF</color>
     <color name="surface_variant">#F3F4F6</color>
+    <color name="background_dark">#282828</color>
 
     <!-- ========== CORES DE TEXTO ========== -->
     <color name="text_primary">#1F2937</color>
     <color name="text_secondary">#6B7280</color>
     <color name="text_hint">#9CA3AF</color>
     <color name="text_on_primary">#FFFFFF</color>
+    <color name="drawer_subheader_text">#FFFFFF</color>
 
     <!-- ========== CORES DE STATUS ========== -->
     <color name="success">#10B981</color>
     <color name="success_light">#D1FAE5</color>
-    <color name="error">#EF4444</color>
     <color name="error_light">#FEE2E2</color>
     <color name="warning">#F59E0B</color>
     <color name="warning_light">#FEF3C7</color>
@@ -55,6 +57,8 @@
     <color name="red_500">#EF4444</color>
     <color name="red_light">#FEE2E2</color>
     <color name="gray_500">#6B7280</color>
+    <color name="gray_700">#374151</color>
+    <color name="gray_900">#1F2937</color>
     <color name="gray_light">#F3F4F6</color>
 
     <!-- ========== CORES DE BORDAS ========== -->
@@ -65,6 +69,7 @@
     <!-- ========== CORES TRANSPARENTES ========== -->
     <color name="overlay">#80000000</color>
     <color name="overlay_light">#40000000</color>
+    <color name="overlay_background">#80000000</color>
 
     <!-- ========== CHIPS E FILTROS ========== -->
     <color name="chip_normal">#F8FAFC</color>
@@ -75,7 +80,7 @@
     <color name="chip_background_selector">#F8FAFC</color>
 
     <!-- ========== NAVEGAÇÃO ========== -->
-    <color name="nav_item_color">#6B7280</color>
+    <color name="nav_item_color">#404CCF</color>
     <color name="bottom_nav_item_color">#6B7280</color>
 
     <!-- ========== CORES ADICIONAIS PARA COMPATIBILIDADE ========== -->
@@ -99,6 +104,7 @@
     <color name="state_focused">#33404CCF</color>
     <color name="state_selected">#404CCF</color>
     <color name="state_disabled">#9CA3AF</color>
+    <color name="button_primary_pressed">#3700B3</color>
 
     <!-- ========== CORES DE FEEDBACK ========== -->
     <color name="feedback_positive">#D1FAE5</color>
@@ -122,4 +128,12 @@
     <color name="sidebar_accent_foreground">#404CCF</color>
     <color name="sidebar_border">#E5E7EB</color>
     <color name="sidebar_ring">#3B82F6</color>
+
+    <!-- ========== CORES DOS CARDS ========== -->
+    <color name="card_bg_1">#404CCF</color>
+    <color name="card_bg_2">#00BCD4</color>
+    <color name="card_bg_3">#4CAF50</color>
+    <color name="card_bg_4">#FF5722</color>
+    <color name="card_bg_5">#9C27B0</color>
+    <color name="card_bg_6">#FF9800</color>
 </resources>

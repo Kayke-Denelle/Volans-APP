@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Aba ativa -->
+    <item android:state_checked="true" android:color="@color/nav_item_color" />
+    <!-- Aba selecionada (opcional) -->
+    <item android:state_selected="true" android:color="@color/nav_item_color" />
+    <!-- Demais abas -->
+    <item android:color="@color/bottom_nav_item_color" />
+</selector>
