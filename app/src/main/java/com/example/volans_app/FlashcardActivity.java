@@ -1,21 +1,29 @@
 package com.example.volans_app;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.volans_app.DTO.Flashcard;
 import com.example.volans_app.adapter.FlashcardAdapter;
+import com.example.volans_app.adapter.ItemTouchHelperCallback;
 import com.example.volans_app.api.RetrofitClient;
 import com.example.volans_app.utils.SharedPrefManager;
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
@@ -28,22 +36,28 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class FlashcardActivity extends AppCompatActivity {
+public class FlashcardActivity extends AppCompatActivity implements
+        FlashcardAdapter.OnItemClickListener, FlashcardAdapter.OnStartDragListener {
 
     private EditText etPergunta, etResposta;
     private Button btnAdicionarFlashcard;
-    private Button btnVoltar;
+    private ImageView btnVoltar;
     private RecyclerView rvFlashcards;
     private LinearLayout layoutEmptyState;
-    private TextView tvFlashcardCount;
+    private TextView tvBaralhoNome;
     private ExtendedFloatingActionButton fabAddFlashcard;
     private FlashcardAdapter adapter;
     private List<Flashcard> lista = new ArrayList<>();
     private String baralhoId;
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Configurar a barra de status ANTES de setContentView
+        setupStatusBar();
+
         setContentView(R.layout.activity_flashcard2);
 
         // Inicializando os componentes
@@ -58,6 +72,38 @@ public class FlashcardActivity extends AppCompatActivity {
         carregarFlashcards();
     }
 
+    private void setupStatusBar() {
+        // Configurar a janela para desenhar atrás das barras do sistema
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+
+            // Definir a cor da barra de status para combinar com o fundo
+            getWindow().setStatusBarColor(0xFFF5F7FA); // #F5F7FA
+
+            // Configurar para ícones escuros na barra de status (para fundo claro)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                getWindow().getDecorView().setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                                View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                );
+            }
+
+            // Configurar barra de navegação para Android 8.1+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                getWindow().setNavigationBarColor(0xFFF5F7FA); // #F5F7FA
+
+                // Ícones escuros na barra de navegação
+                int flags = getWindow().getDecorView().getSystemUiVisibility();
+                flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(flags);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Para Android 8.0, apenas definir a cor
+                getWindow().setNavigationBarColor(0xFFF5F7FA); // #F5F7FA
+            }
+        }
+    }
+
     private void initializeViews() {
         etPergunta = findViewById(R.id.etPergunta);
         etResposta = findViewById(R.id.etResposta);
@@ -65,14 +111,22 @@ public class FlashcardActivity extends AppCompatActivity {
         btnVoltar = findViewById(R.id.btnVoltar);
         rvFlashcards = findViewById(R.id.rvFlashcards);
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
-        tvFlashcardCount = findViewById(R.id.tvFlashcardCount);
+        tvBaralhoNome = findViewById(R.id.tvBaralhoNome);
         fabAddFlashcard = findViewById(R.id.fabAddFlashcard);
     }
 
     private void setupRecyclerView() {
         adapter = new FlashcardAdapter(lista);
+        adapter.setOnItemClickListener(this);
+        adapter.setOnStartDragListener(this);
+
         rvFlashcards.setLayoutManager(new LinearLayoutManager(this));
         rvFlashcards.setAdapter(adapter);
+
+        // Configurar ItemTouchHelper para drag & drop
+        ItemTouchHelperCallback callback = new ItemTouchHelperCallback(adapter);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(rvFlashcards);
     }
 
     private void setupClickListeners() {
@@ -92,10 +146,152 @@ public class FlashcardActivity extends AppCompatActivity {
         // Ação para voltar
         btnVoltar.setOnClickListener(v -> {
             animateButton(btnVoltar);
-            Intent intent = new Intent(FlashcardActivity.this, DashboardActivity.class);
-            startActivity(intent);
-            finish();
+            voltarParaDashboard();
         });
+    }
+
+    // Implementação das interfaces do adapter
+    @Override
+    public void onDeleteClick(int position) {
+        mostrarDialogoExclusao(position);
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        // Implementar se quiser ação ao clicar no item
+        // Toast.makeText(this, "Flashcard: " + lista.get(position).getPergunta(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
+    }
+
+    private void mostrarDialogoExclusao(int position) {
+        Flashcard flashcard = lista.get(position);
+
+        // Criar o diálogo customizado
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_delete_flashcard, null);
+        builder.setView(dialogView);
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Configurar os elementos do diálogo
+        TextView tvPerguntaDialog = dialogView.findViewById(R.id.tvPerguntaDialog);
+        TextView btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+        TextView btnExcluir = dialogView.findViewById(R.id.btnExcluir);
+
+        // Definir a pergunta
+        tvPerguntaDialog.setText(flashcard.getPergunta());
+
+        // Configurar botão cancelar
+        btnCancelar.setOnClickListener(v -> {
+            // Animação de clique
+            v.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(100)
+                    .withEndAction(() -> {
+                        v.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(100)
+                                .start();
+                        dialog.dismiss();
+                    })
+                    .start();
+        });
+
+        // Configurar botão excluir
+        btnExcluir.setOnClickListener(v -> {
+            // Animação de clique
+            v.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(100)
+                    .withEndAction(() -> {
+                        v.animate()
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(100)
+                                .start();
+                        dialog.dismiss();
+                        excluirFlashcard(position);
+                    })
+                    .start();
+        });
+
+        // Animação de entrada do diálogo
+        dialog.setOnShowListener(dialogInterface -> {
+            dialogView.setAlpha(0f);
+            dialogView.setScaleX(0.8f);
+            dialogView.setScaleY(0.8f);
+            dialogView.animate()
+                    .alpha(1f)
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(300)
+                    .start();
+        });
+
+        dialog.show();
+    }
+
+    private void excluirFlashcard(int position) {
+        Flashcard flashcard = lista.get(position);
+        String token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
+
+        Log.d("FlashcardActivity", "Tentando excluir flashcard ID: " + flashcard.getBaralhoId());
+
+        // Chamar a API para excluir o flashcard do servidor
+        Call<Void> call = RetrofitClient.getApiService().excluirFlashcard(flashcard.getBaralhoId(), token);
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                if (response.isSuccessful()) {
+                    Log.d("FlashcardActivity", "Flashcard excluído com sucesso no servidor");
+
+                    // Remover da lista local apenas após confirmação do servidor
+                    lista.remove(position);
+                    adapter.notifyItemRemoved(position);
+                    updateUI();
+
+                    // Toast de sucesso
+                    Toast.makeText(FlashcardActivity.this, "🗑️ Flashcard excluído com sucesso!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("FlashcardActivity", "Erro ao excluir flashcard. Código: " + response.code());
+                    try {
+                        String erro = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
+                        Log.e("FlashcardActivity", "Erro detalhado: " + erro);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(FlashcardActivity.this, "❌ Erro ao excluir flashcard", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Log.e("FlashcardActivity", "Falha na requisição de exclusão: " + t.getMessage(), t);
+                Toast.makeText(FlashcardActivity.this, "❌ Falha na conexão. Tente novamente.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    // Método para voltar
+    public void voltarParaDashboard() {
+        Intent intent = new Intent(FlashcardActivity.this, DashboardActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    // Override do botão voltar do sistema
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        voltarParaDashboard();
     }
 
     private void carregarFlashcards() {
@@ -184,11 +380,11 @@ public class FlashcardActivity extends AppCompatActivity {
     private void updateUI() {
         int count = lista.size();
 
-        // Atualizar contador
-        String countText = count == 0 ? "Nenhum flashcard" :
-                count == 1 ? "1 flashcard" :
-                        count + " flashcards";
-        tvFlashcardCount.setText(countText);
+        // Atualizar título com a contagem
+        String titleText = count == 0 ? "Seus Flashcards" :
+                count == 1 ? "Seus Flashcards (1)" :
+                        "Seus Flashcards (" + count + ")";
+        tvBaralhoNome.setText(titleText);
 
         // Mostrar/esconder estado vazio
         if (count == 0) {

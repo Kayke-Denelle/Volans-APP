@@ -3,6 +3,15 @@ package com.example.volans_app.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.volans_app.DTO.Tarefa;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class SharedPrefManager {
     private static final String SHARED_PREF_NAME = "volans_prefs";
     private static final String KEY_TOKEN = "token";
@@ -183,6 +192,36 @@ public class SharedPrefManager {
                 !getNomeUsuario().isEmpty() &&
                 !getEmailUsuario().isEmpty();
     }
+
+    public void saveTarefas(List<Tarefa> tarefas) {
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(tarefas);
+        editor.putString("tarefas_list", json);
+        editor.apply();
+    }
+
+    public List<Tarefa> getTarefas() {
+        String json = sharedPreferences.getString("tarefas_list", "");
+        if (json.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Tarefa>>(){}.getType();
+        return gson.fromJson(json, type);
+    }
+
+    // Método para obter próximas tarefas para o Dashboard
+    public List<Tarefa> getProximasTarefas(int limit) {
+        List<Tarefa> todasTarefas = getTarefas();
+        return todasTarefas.stream()
+                .filter(t -> !t.isConcluida())
+                .sorted((t1, t2) -> t1.getDataLimite().compareTo(t2.getDataLimite()))
+                .limit(limit)
+                .collect(Collectors.toList());
+    }
+
 
     // Obter resumo dos dados do usuário para debug
     public String getUserDataSummary() {

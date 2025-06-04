@@ -17,16 +17,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".DashboardFragment"
-            android:exported="false" />
-        <activity
-            android:name=".SwipeNavigationActivity"
-            android:exported="false" />
-        <activity
-            android:name=".PerfilActivity"
-            android:exported="false" />
-        <activity
-            android:name=".Perfil"
+            android:name=".TarefaActivity"
             android:exported="false" />
         <activity
             android:name=".LoginActivity"

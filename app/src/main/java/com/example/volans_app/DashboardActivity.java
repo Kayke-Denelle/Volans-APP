@@ -13,10 +13,9 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.GestureDetector;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
@@ -67,10 +66,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DashboardActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    private static final String TAG = "DashboardActivity";
     private static final int PICK_IMAGE_REQUEST = 1;
-    private static final int SWIPE_THRESHOLD = 100;
-    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     private TextView tvQuantidadeBaralhos, tvQuantidadeFlashcards;
     private TextView tvNomeUsuario;
@@ -102,9 +99,6 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
     // Quick Actions
     private View quickActionStudy, quickActionCreate;
-
-    // Gesture detector para swipe navigation
-    private GestureDetector gestureDetector;
 
     // Classe interna para ScheduleItem
     public static class ScheduleItem {
@@ -140,7 +134,6 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                 String deliveryDateTime = deliveryDate + " " + deliveryTime;
                 Date deliveryDateParsed = sdf.parse(deliveryDateTime);
                 Date currentDate = new Date();
-
                 return currentDate.after(deliveryDateParsed);
             } catch (ParseException e) {
                 return false;
@@ -150,7 +143,6 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
 
     // Classe interna para ScheduleAdapter
     public static class ScheduleAdapter extends RecyclerView.Adapter<ScheduleAdapter.ScheduleViewHolder> {
-
         private List<ScheduleItem> scheduleList;
 
         public ScheduleAdapter(List<ScheduleItem> scheduleList) {
@@ -217,23 +209,15 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "DashboardActivity onCreate");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-            getWindow().setNavigationBarColor(Color.BLACK);
-
-            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-            getWindow().getDecorView().setSystemUiVisibility(flags);
-        }
-
+        setupStatusBar();
         setContentView(R.layout.activity_dashboard);
 
         initializeViews();
         setupDrawer();
         setupProfileImage();
         setupBottomNavigation();
-        setupSwipeNavigation();
         setupChatbot();
         setupButtons();
         setupSchedule();
@@ -241,6 +225,15 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         carregarQuantidades();
         configurarGraficoLinha();
         loadScheduleData();
+    }
+
+    private void setupStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.BLACK);
+            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+        }
     }
 
     private void initializeViews() {
@@ -265,59 +258,8 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
             profileImage = headerView.findViewById(R.id.profileImage);
             profileImageContainer = headerView.findViewById(R.id.profileImageContainer);
         }
-    }
 
-    private void setupSwipeNavigation() {
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                if (e1 == null || e2 == null) return false;
-
-                float diffX = e2.getX() - e1.getX();
-                float diffY = e2.getY() - e1.getY();
-
-                // Verificar se é um swipe horizontal (não vertical)
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // Swipe para a esquerda - ir para Baralhos
-                    if (diffX < -SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        navigateToBaralhos();
-                        return true;
-                    }
-                    // Swipe para a direita - ir para Atividades
-                    else if (diffX > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        navigateToAtividades();
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-
-        // Aplicar gesture detector ao layout principal
-        View mainContent = findViewById(R.id.drawer_layout);
-        if (mainContent != null) {
-            mainContent.setOnTouchListener((v, event) -> {
-                // Só processar swipe se o drawer estiver fechado
-                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    gestureDetector.onTouchEvent(event);
-                }
-                return false;
-            });
-        }
-    }
-
-    private void navigateToBaralhos() {
-        Intent intent = new Intent(this, BaralhoActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.smooth_slide_in_right, R.anim.smooth_slide_out_left);
-        finish();
-    }
-
-    private void navigateToAtividades() {
-        Intent intent = new Intent(this, AtividadeActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.smooth_slide_in_left, R.anim.smooth_slide_out_right);
-        finish();
+        Log.d(TAG, "Views inicializadas - BottomNav: " + (bottomNavigationView != null));
     }
 
     private void setupProfileImage() {
@@ -441,16 +383,13 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         navigationView.setNavigationItemSelectedListener(this);
 
         if (btnHamburger != null) {
-            btnHamburger.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    animateButton(btnHamburger);
+            btnHamburger.setOnClickListener(v -> {
+                animateButton(btnHamburger);
 
-                    if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                        drawerLayout.closeDrawer(GravityCompat.START);
-                    } else {
-                        drawerLayout.openDrawer(GravityCompat.START);
-                    }
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    drawerLayout.openDrawer(GravityCompat.START);
                 }
             });
         }
@@ -461,13 +400,17 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         int id = item.getItemId();
         drawerLayout.closeDrawer(GravityCompat.START);
 
+        // NAVEGAÇÃO CORRETA DO DRAWER
         if (id == R.id.nav_dashboard) {
-            return true;
+            return true; // Já está na DashboardActivity
         } else if (id == R.id.nav_baralhos) {
-            navigateToBaralhos();
+            navigateToActivity(BaralhoActivity.class);
             return true;
         } else if (id == R.id.nav_atividades) {
-            navigateToAtividades();
+            navigateToActivity(AtividadeActivity.class);
+            return true;
+        } else if (id == R.id.nav_tarefas) {
+            navigateToActivity(TarefaActivity.class);
             return true;
         } else if (id == R.id.nav_termos) {
             showTermsOfUse();
@@ -484,15 +427,70 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         if (quickActionStudy != null) {
             quickActionStudy.setOnClickListener(v -> {
                 animateQuickAction(quickActionStudy);
-                navigateToBaralhos();
+                navigateToActivity(BaralhoActivity.class);
             });
         }
 
         if (quickActionCreate != null) {
             quickActionCreate.setOnClickListener(v -> {
                 animateQuickAction(quickActionCreate);
-                navigateToAtividades();
+                navigateToActivity(AtividadeActivity.class);
             });
+        }
+    }
+
+    private void setupBottomNavigation() {
+        if (bottomNavigationView == null) {
+            Log.e(TAG, "BottomNavigationView não encontrada!");
+            return;
+        }
+
+        // Selecionar "Início" como ativo
+        bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
+
+        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+                Log.d(TAG, "Bottom nav item clicado: " + getResourceName(itemId));
+
+                animateBottomNavigationIcon(bottomNavigationView.findViewById(itemId));
+
+                // NAVEGAÇÃO CORRETA - CADA ID VAI PARA SUA ACTIVITY ESPECÍFICA
+                if (itemId == R.id.nav_dashboard) {
+                    return true; // Já está na DashboardActivity
+                } else if (itemId == R.id.nav_baralhos) {
+                    Log.d(TAG, "Navegando para BaralhoActivity");
+                    navigateToActivity(BaralhoActivity.class);
+                    return true;
+                } else if (itemId == R.id.nav_atividade) {
+                    Log.d(TAG, "Navegando para AtividadeActivity");
+                    navigateToActivity(AtividadeActivity.class);
+                    return true;
+                } else if (itemId == R.id.nav_tarefas) {
+                    Log.d(TAG, "Navegando para TarefaActivity");
+                    navigateToActivity(TarefaActivity.class);
+                    return true;
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void navigateToActivity(Class<?> activityClass) {
+        Intent intent = new Intent(this, activityClass);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        // REMOVIDO: overridePendingTransition - sem efeitos de transição
+        Log.d(TAG, "Navegando para: " + activityClass.getSimpleName());
+    }
+
+    private String getResourceName(int resourceId) {
+        try {
+            return getResources().getResourceEntryName(resourceId);
+        } catch (Exception e) {
+            return "unknown_" + resourceId;
         }
     }
 
@@ -524,30 +522,6 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
                             .start();
                 })
                 .start();
-    }
-
-    private void setupBottomNavigation() {
-        bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
-
-                animateBottomNavigationIcon(bottomNavigationView.findViewById(itemId));
-
-                if (itemId == R.id.nav_dashboard) {
-                    return true;
-                } else if (itemId == R.id.nav_baralhos) {
-                    navigateToBaralhos();
-                    return true;
-                } else if (itemId == R.id.nav_atividade) {
-                    navigateToAtividades();
-                    return true;
-                }
-
-                return false;
-            }
-        });
     }
 
     private void animateBottomNavigationIcon(View view) {
@@ -816,6 +790,8 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     @Override
     protected void onResume() {
         super.onResume();
-        bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
+        }
     }
 }

@@ -15,12 +15,7 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="QuizRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:textSize">16sp</item>
-        <item name="android:minHeight">48dp</item>
-        <item name="android:layout_marginBottom">8dp</item>
-    </style>
-
+    <!-- Estilos para botões -->
     <style name="Widget.AppCompat.Button.Borderless" parent="Base.Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:background">@android:color/transparent</item>
@@ -32,16 +27,32 @@
         <item name="android:elevation">2dp</item>
     </style>
 
-    <style name="CorrectAnswerToast" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:background">@drawable/toast_correct_background</item>
-        <item name="android:textColor">@color/white</item>
+    <!-- Estilos para RadioButtons do Quiz -->
+    <style name="QuizRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:background">@drawable/bg_radio_button_selector</item>
+        <item name="android:button">@null</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:layout_marginBottom">12dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">#212121</item>
+        <item name="android:minHeight">48dp</item>
     </style>
 
-    <style name="WrongAnswerToast" parent="Widget.AppCompat.CompoundButton.RadioButton">
-        <item name="android:background">@drawable/toast_wrong_background</item>
-        <item name="android:textColor">@color/white</item>
+    <!-- Estilos para toasts de resposta -->
+    <style name="CorrectAnswerToast">
+        <item name="android:background">@drawable/bg_toast_correct</item>
+        <item name="android:textColor">#FFFFFF</item>
     </style>
 
+    <style name="WrongAnswerToast">
+        <item name="android:background">@drawable/bg_toast_wrong</item>
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
+    <!-- Estilos para Bottom Navigation -->
     <style name="ModernBottomNavigation" parent="Widget.MaterialComponents.BottomNavigationView">
         <item name="itemIconTint">@color/bottom_nav_item_color</item>
         <item name="itemTextColor">@color/bottom_nav_item_color</item>
@@ -56,6 +67,7 @@
         <item name="android:drawable">@drawable/bottom_nav_indicator</item>
     </style>
 
+    <!-- Estilos para Navigation Drawer -->
     <style name="AppTheme.NavigationDrawer">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textSize">16sp</item>
@@ -101,12 +113,15 @@
         <item name="subheaderColor">#FFFFFF</item>
     </style>
 
+    <!-- Estilos para diálogos customizados -->
     <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:windowTitleStyle">@style/CustomDialogTitle</item>
         <item name="android:windowAnimationStyle">@style/CustomDialogAnimation</item>
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
     </style>
 
     <style name="CustomDialogTitle">
@@ -120,6 +135,13 @@
         <item name="android:windowExitAnimation">@anim/dialog_exit</item>
     </style>
 
+    <!-- Estilo para animação do diálogo de loading -->
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+    </style>
+
+    <!-- Estilos para PopupMenu -->
     <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@drawable/popup_menu_background</item>
         <item name="android:textColor">#1F2937</item>
@@ -127,4 +149,19 @@
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
     </style>
+
+    <style name="LoadingDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@style/LoadingDialogAnimation</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.6</item>
+    </style>
+
+    <style name="LoadingDialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/dialog_enter</item>
+        <item name="android:windowExitAnimation">@anim/dialog_exit</item>
+    </style>
+
 </resources>

@@ -14,12 +14,9 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -60,14 +57,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class BaralhoActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    private static final String TAG = "BaralhoActivity";
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int PICK_PROFILE_IMAGE_REQUEST = 2;
-    private static final String TAG = "BaralhoActivity";
-
-    // Constantes para swipe navigation
-    private static final int SWIPE_THRESHOLD = 100;
-    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     // Views
     private DrawerLayout drawerLayout;
@@ -96,34 +88,31 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
     private ImageView currentImagePreview = null;
     private Uri selectedImageUri = null;
 
-    // Gesture detector para swipe navigation
-    private GestureDetector gestureDetector;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "BaralhoActivity onCreate");
 
-        // Configurar status bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-            getWindow().setNavigationBarColor(Color.BLACK);
-
-            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-            getWindow().getDecorView().setSystemUiVisibility(flags);
-        }
-
+        setupStatusBar();
         setContentView(R.layout.activity_baralho);
 
         initializeViews();
         setupDrawer();
         setupProfileImage();
         setupBottomNavigation();
-        setupSwipeNavigation();
         setupButtons();
         setupRecyclerView();
         setupUserData();
         listarBaralhos();
+    }
+
+    private void setupStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.BLACK);
+            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+        }
     }
 
     private void initializeViews() {
@@ -143,73 +132,19 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
             profileImage = headerView.findViewById(R.id.profileImage);
             profileImageContainer = headerView.findViewById(R.id.profileImageContainer);
         }
-    }
 
-    private void setupSwipeNavigation() {
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                if (e1 == null || e2 == null) return false;
-
-                float diffX = e2.getX() - e1.getX();
-                float diffY = e2.getY() - e1.getY();
-
-                // Verificar se é um swipe horizontal
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // Swipe para a direita - voltar para Dashboard
-                    if (diffX > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        navigateToDashboard();
-                        return true;
-                    }
-                    // Swipe para a esquerda - ir para Atividades
-                    else if (diffX < -SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        navigateToAtividades();
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-
-        // Aplicar gesture detector ao layout principal
-        View mainContent = findViewById(R.id.drawer_layout);
-        if (mainContent != null) {
-            mainContent.setOnTouchListener((v, event) -> {
-                // Só processar swipe se o drawer estiver fechado
-                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    gestureDetector.onTouchEvent(event);
-                }
-                return false;
-            });
-        }
-    }
-
-    private void navigateToDashboard() {
-        Intent intent = new Intent(this, DashboardActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.smooth_slide_in_left, R.anim.smooth_slide_out_right);
-        finish();
-    }
-
-    private void navigateToAtividades() {
-        Intent intent = new Intent(this, AtividadeActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.smooth_slide_in_right, R.anim.smooth_slide_out_left);
-        finish();
+        Log.d(TAG, "Views inicializadas - BottomNav: " + (bottomNavigationView != null));
     }
 
     private void setupProfileImage() {
         if (profileImageContainer != null) {
             profileImageContainer.setOnClickListener(v -> {
-                // Abrir seletor de imagens para foto de perfil
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Selecione uma imagem de perfil"), PICK_PROFILE_IMAGE_REQUEST);
             });
         }
-
-        // Carregar imagem de perfil salva, se existir
         loadProfileImage();
     }
 
@@ -234,13 +169,17 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
         int id = item.getItemId();
         drawerLayout.closeDrawer(GravityCompat.START);
 
+        // NAVEGAÇÃO CORRETA DO DRAWER
         if (id == R.id.nav_dashboard) {
-            navigateToDashboard();
+            navigateToActivity(DashboardActivity.class);
             return true;
         } else if (id == R.id.nav_baralhos) {
-            return true;
+            return true; // Já está na BaralhoActivity
         } else if (id == R.id.nav_atividades) {
-            navigateToAtividades();
+            navigateToActivity(AtividadeActivity.class);
+            return true;
+        } else if (id == R.id.nav_tarefas) {
+            navigateToActivity(TarefaActivity.class);
             return true;
         } else if (id == R.id.nav_termos) {
             showTermsOfUse();
@@ -254,27 +193,58 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
     }
 
     private void setupBottomNavigation() {
+        if (bottomNavigationView == null) {
+            Log.e(TAG, "BottomNavigationView não encontrada!");
+            return;
+        }
+
+        // Selecionar "Baralhos" como ativo
         bottomNavigationView.setSelectedItemId(R.id.nav_baralhos);
+
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
+                Log.d(TAG, "Bottom nav item clicado: " + getResourceName(itemId));
 
                 animateBottomNavigationIcon(bottomNavigationView.findViewById(itemId));
 
+                // NAVEGAÇÃO CORRETA - CADA ID VAI PARA SUA ACTIVITY ESPECÍFICA
                 if (itemId == R.id.nav_dashboard) {
-                    navigateToDashboard();
+                    Log.d(TAG, "Navegando para DashboardActivity");
+                    navigateToActivity(DashboardActivity.class);
                     return true;
                 } else if (itemId == R.id.nav_baralhos) {
-                    return true;
+                    return true; // Já está na BaralhoActivity
                 } else if (itemId == R.id.nav_atividade) {
-                    navigateToAtividades();
+                    Log.d(TAG, "Navegando para AtividadeActivity");
+                    navigateToActivity(AtividadeActivity.class);
+                    return true;
+                } else if (itemId == R.id.nav_tarefas) {
+                    Log.d(TAG, "Navegando para TarefaActivity");
+                    navigateToActivity(TarefaActivity.class);
                     return true;
                 }
 
                 return false;
             }
         });
+    }
+
+    private void navigateToActivity(Class<?> activityClass) {
+        Intent intent = new Intent(this, activityClass);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        // REMOVIDO: overridePendingTransition - sem efeitos de transição
+        Log.d(TAG, "Navegando para: " + activityClass.getSimpleName());
+    }
+
+    private String getResourceName(int resourceId) {
+        try {
+            return getResources().getResourceEntryName(resourceId);
+        } catch (Exception e) {
+            return "unknown_" + resourceId;
+        }
     }
 
     private void setupButtons() {
@@ -302,7 +272,7 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
             Intent intent = new Intent(BaralhoActivity.this, FlashcardActivity.class);
             intent.putExtra("baralhoId", baralho.getId());
             startActivity(intent);
-            overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+            // REMOVIDO: overridePendingTransition
         });
 
         // Configurar listener para opções
@@ -336,7 +306,7 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
             nomeUsuario = "Usuário";
         }
 
-        // Atualizar nome no header do drawer (igual ao Dashboard)
+        // Atualizar nome no header do drawer
         if (tvNomeUsuarioDrawer != null) {
             tvNomeUsuarioDrawer.setText(nomeUsuario);
         }
@@ -419,9 +389,7 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
             String filename = "profile_image.png";
             bitmap.compress(Bitmap.CompressFormat.PNG, 100,
                     openFileOutput(filename, MODE_PRIVATE));
-
             SharedPrefManager.getInstance(this).saveProfileImagePath(filename);
-
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(this, "Erro ao salvar imagem", Toast.LENGTH_SHORT).show();
@@ -442,7 +410,7 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
         }
     }
 
-    // Resto dos métodos permanecem iguais...
+    // Resto dos métodos de baralho permanecem iguais...
     private void showCreateBaralhoDialog() {
         baralhoEditando = null;
         selectedImagePath = null;
@@ -935,13 +903,15 @@ public class BaralhoActivity extends AppCompatActivity implements NavigationView
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            navigateToDashboard();
+            super.onBackPressed();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        bottomNavigationView.setSelectedItemId(R.id.nav_baralhos);
+        if (bottomNavigationView != null) {
+            bottomNavigationView.setSelectedItemId(R.id.nav_baralhos);
+        }
     }
 }

@@ -16,11 +16,13 @@
             android:id="@+id/nav_atividades"
             android:icon="@drawable/ic_atividades"
             android:title="Atividades" />
-        <!-- Item "Meu Perfil" removido -->
+        <item
+            android:id="@+id/nav_tarefas"
+            android:icon="@drawable/ic_tarefas"
+            android:title="Tarefas" />
     </group>
 
-    <item android:title="Outros"
-        android:titleCondensed="Outros">
+    <item android:title="Outros">
         <menu>
             <item
                 android:id="@+id/nav_termos"

@@ -1,7 +1,6 @@
 package com.example.volans_app;
 
 import android.animation.ValueAnimator;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,11 +13,10 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageButton;
@@ -42,6 +40,7 @@ import com.example.volans_app.DTO.QuizModel;
 import com.example.volans_app.adapter.AtividadeBaralhoAdapter;
 import com.example.volans_app.api.ApiService;
 import com.example.volans_app.api.RetrofitClient;
+import com.example.volans_app.utils.LoadingDialog;
 import com.example.volans_app.utils.SharedPrefManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -57,12 +56,8 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class AtividadeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
-
+    private static final String TAG = "AtividadeActivity";
     private static final int PICK_PROFILE_IMAGE_REQUEST = 2;
-
-    // Constantes para swipe navigation
-    private static final int SWIPE_THRESHOLD = 100;
-    private static final int SWIPE_VELOCITY_THRESHOLD = 100;
 
     // Views
     private DrawerLayout drawerLayout;
@@ -81,31 +76,26 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
     private List<Baralho> listaBaralhos = new ArrayList<>();
     private String token;
 
-    // Gesture detector para swipe navigation
-    private GestureDetector gestureDetector;
+    // Loading dialog
+    private LoadingDialog loadingDialog;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "AtividadeActivity onCreate");
 
-        // Configurar status bar
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-            getWindow().setNavigationBarColor(Color.BLACK);
-
-            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
-            getWindow().getDecorView().setSystemUiVisibility(flags);
-        }
-
+        setupStatusBar();
         setContentView(R.layout.activity_atividade);
+
+        // Inicializar loading dialog
+        loadingDialog = new LoadingDialog(this);
 
         // Inicializar views
         initializeViews();
         setupDrawer();
         setupProfileImage();
         setupBottomNavigation();
-        setupSwipeNavigation();
         setupUserData();
 
         // Verificar token
@@ -119,6 +109,15 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
         // Configurar RecyclerView e carregar dados
         setupRecyclerView();
         listarBaralhos();
+    }
+
+    private void setupStatusBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+            getWindow().setNavigationBarColor(Color.BLACK);
+            int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+        }
     }
 
     private void initializeViews() {
@@ -135,59 +134,8 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
             profileImage = headerView.findViewById(R.id.profileImage);
             profileImageContainer = headerView.findViewById(R.id.profileImageContainer);
         }
-    }
 
-    private void setupSwipeNavigation() {
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-                if (e1 == null || e2 == null) return false;
-
-                float diffX = e2.getX() - e1.getX();
-                float diffY = e2.getY() - e1.getY();
-
-                // Verificar se é um swipe horizontal
-                if (Math.abs(diffX) > Math.abs(diffY)) {
-                    // Swipe para a direita - ir para Baralhos
-                    if (diffX > SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        navigateToBaralhos();
-                        return true;
-                    }
-                    // Swipe para a esquerda - ir para Dashboard
-                    else if (diffX < -SWIPE_THRESHOLD && Math.abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
-                        navigateToDashboard();
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
-
-        // Aplicar gesture detector ao layout principal
-        View mainContent = findViewById(R.id.drawer_layout);
-        if (mainContent != null) {
-            mainContent.setOnTouchListener((v, event) -> {
-                // Só processar swipe se o drawer estiver fechado
-                if (!drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    gestureDetector.onTouchEvent(event);
-                }
-                return false;
-            });
-        }
-    }
-
-    private void navigateToDashboard() {
-        Intent intent = new Intent(this, DashboardActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
-        finish();
-    }
-
-    private void navigateToBaralhos() {
-        Intent intent = new Intent(this, BaralhoActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-        finish();
+        Log.d(TAG, "Views inicializadas - BottomNav: " + (bottomNavigationView != null));
     }
 
     private void setupDrawer() {
@@ -211,13 +159,17 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
         int id = item.getItemId();
         drawerLayout.closeDrawer(GravityCompat.START);
 
+        // NAVEGAÇÃO CORRETA DO DRAWER
         if (id == R.id.nav_dashboard) {
-            navigateToDashboard();
+            navigateToActivity(DashboardActivity.class);
             return true;
         } else if (id == R.id.nav_baralhos) {
-            navigateToBaralhos();
+            navigateToActivity(BaralhoActivity.class);
             return true;
         } else if (id == R.id.nav_atividades) {
+            return true; // Já está na AtividadeActivity
+        } else if (id == R.id.nav_tarefas) {
+            navigateToActivity(TarefaActivity.class);
             return true;
         } else if (id == R.id.nav_termos) {
             showTermsOfUse();
@@ -233,15 +185,12 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
     private void setupProfileImage() {
         if (profileImageContainer != null) {
             profileImageContainer.setOnClickListener(v -> {
-                // Abrir seletor de imagens para foto de perfil
                 Intent intent = new Intent();
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Selecione uma imagem de perfil"), PICK_PROFILE_IMAGE_REQUEST);
             });
         }
-
-        // Carregar imagem de perfil salva, se existir
         loadProfileImage();
     }
 
@@ -263,7 +212,6 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == PICK_PROFILE_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
-            // Seleção de imagem de perfil
             Uri imageUri = data.getData();
             try {
                 Bitmap bitmap = processProfileImage(imageUri);
@@ -365,29 +313,58 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
     }
 
     private void setupBottomNavigation() {
+        if (bottomNavigationView == null) {
+            Log.e(TAG, "BottomNavigationView não encontrada!");
+            return;
+        }
+
+        // Selecionar "Atividades" como ativo
         bottomNavigationView.setSelectedItemId(R.id.nav_atividade);
+
         bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
+                Log.d(TAG, "Bottom nav item clicado: " + getResourceName(itemId));
 
-                // Animar o ícone selecionado
                 animateBottomNavigationIcon(bottomNavigationView.findViewById(itemId));
 
-                if (itemId == R.id.nav_atividade) {
-                    // Já está na tela de atividades
-                    return true;
-                } else if (itemId == R.id.nav_dashboard) {
-                    navigateToDashboard();
+                // NAVEGAÇÃO CORRETA - CADA ID VAI PARA SUA ACTIVITY ESPECÍFICA
+                if (itemId == R.id.nav_dashboard) {
+                    Log.d(TAG, "Navegando para DashboardActivity");
+                    navigateToActivity(DashboardActivity.class);
                     return true;
                 } else if (itemId == R.id.nav_baralhos) {
-                    navigateToBaralhos();
+                    Log.d(TAG, "Navegando para BaralhoActivity");
+                    navigateToActivity(BaralhoActivity.class);
+                    return true;
+                } else if (itemId == R.id.nav_atividade) {
+                    return true; // Já está na AtividadeActivity
+                } else if (itemId == R.id.nav_tarefas) {
+                    Log.d(TAG, "Navegando para TarefaActivity");
+                    navigateToActivity(TarefaActivity.class);
                     return true;
                 }
 
                 return false;
             }
         });
+    }
+
+    private void navigateToActivity(Class<?> activityClass) {
+        Intent intent = new Intent(this, activityClass);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
+        // REMOVIDO: overridePendingTransition - sem efeitos de transição
+        Log.d(TAG, "Navegando para: " + activityClass.getSimpleName());
+    }
+
+    private String getResourceName(int resourceId) {
+        try {
+            return getResources().getResourceEntryName(resourceId);
+        } catch (Exception e) {
+            return "unknown_" + resourceId;
+        }
     }
 
     private void animateBottomNavigationIcon(View view) {
@@ -452,17 +429,38 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
     }
 
     private void iniciarQuiz(String baralhoId) {
-        ProgressDialog progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage("Gerando novo quiz...");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
+        // Mostrar diálogo de loading customizado
+        loadingDialog.show("Gerando novo quiz...");
+
+        // Simular diferentes etapas do carregamento com mensagens dinâmicas
+        handler.postDelayed(() -> {
+            if (loadingDialog.isShowing()) {
+                loadingDialog.updateMessage("Analisando flashcards...");
+            }
+        }, 800);
+
+        handler.postDelayed(() -> {
+            if (loadingDialog.isShowing()) {
+                loadingDialog.updateMessage("Criando perguntas personalizadas...");
+            }
+        }, 1600);
+
+        handler.postDelayed(() -> {
+            if (loadingDialog.isShowing()) {
+                loadingDialog.updateMessage("Finalizando preparação...");
+            }
+        }, 2400);
 
         ApiService api = RetrofitClient.getRetrofitInstance().create(ApiService.class);
         Call<List<QuestaoQuiz>> call = api.gerarQuiz(token, baralhoId);
         call.enqueue(new Callback<List<QuestaoQuiz>>() {
             @Override
             public void onResponse(Call<List<QuestaoQuiz>> call, Response<List<QuestaoQuiz>> response) {
-                progressDialog.dismiss();
+                // Remover todos os handlers pendentes
+                handler.removeCallbacksAndMessages(null);
+
+                // Fechar diálogo de loading
+                loadingDialog.dismiss();
 
                 if (response.isSuccessful() && response.body() != null) {
                     List<QuestaoQuiz> questoes = response.body();
@@ -482,6 +480,7 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
                     Intent intent = new Intent(AtividadeActivity.this, QuizActivity.class);
                     intent.putExtra("quiz", quiz);
                     startActivity(intent);
+                    // REMOVIDO: overridePendingTransition
                 } else {
                     Log.e("QUIZ_API", "Erro ao gerar quiz. Código: " + response.code());
                     Toast.makeText(AtividadeActivity.this,
@@ -492,7 +491,12 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
 
             @Override
             public void onFailure(Call<List<QuestaoQuiz>> call, Throwable t) {
-                progressDialog.dismiss();
+                // Remover todos os handlers pendentes
+                handler.removeCallbacksAndMessages(null);
+
+                // Fechar diálogo de loading
+                loadingDialog.dismiss();
+
                 Log.e("QUIZ_API", "Falha ao gerar quiz: " + t.getMessage(), t);
                 Toast.makeText(AtividadeActivity.this,
                         "Falha na conexão: " + t.getMessage(),
@@ -541,7 +545,6 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
     @Override
     protected void onResume() {
         super.onResume();
-        // Garantir que o item correto esteja selecionado
         if (bottomNavigationView != null) {
             bottomNavigationView.setSelectedItemId(R.id.nav_atividade);
         }
@@ -552,8 +555,21 @@ public class AtividadeActivity extends AppCompatActivity implements NavigationVi
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            // Navegar para o Dashboard ao pressionar voltar
-            navigateToDashboard();
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Limpar handlers para evitar memory leaks
+        if (handler != null) {
+            handler.removeCallbacksAndMessages(null);
+        }
+
+        // Fechar diálogo se ainda estiver aberto
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
         }
     }
 }
