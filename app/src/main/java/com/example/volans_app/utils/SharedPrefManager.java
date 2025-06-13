@@ -51,7 +51,7 @@ public class SharedPrefManager {
         return sharedPreferences.getString(KEY_TOKEN, null);
     }
 
-    // User ID
+    // User ID - ATUALIZADO para retornar valor padrão
     public void saveUserId(String userId) {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(KEY_USER_ID, userId);
@@ -59,7 +59,8 @@ public class SharedPrefManager {
     }
 
     public String getUserId() {
-        return sharedPreferences.getString(KEY_USER_ID, null);
+        // CORREÇÃO: Retorna "default_user" se não houver ID salvo
+        return sharedPreferences.getString(KEY_USER_ID, "default_user");
     }
 
     // Nome do usuário
@@ -221,7 +222,6 @@ public class SharedPrefManager {
                 .limit(limit)
                 .collect(Collectors.toList());
     }
-
 
     // Obter resumo dos dados do usuário para debug
     public String getUserDataSummary() {

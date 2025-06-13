@@ -8,6 +8,11 @@
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <!-- Set the default color for radio buttons and other controls -->
+        <item name="colorControlActivated">@color/volans_blue</item>
+        <item name="colorControlNormal">@color/volans_blue</item>
+        <item name="android:datePickerStyle">@style/CustomDatePickerStyle</item>
+        <item name="android:timePickerStyle">@style/CustomTimePickerStyle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -37,19 +42,19 @@
         <item name="android:paddingBottom">16dp</item>
         <item name="android:layout_marginBottom">12dp</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">#212121</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:minHeight">48dp</item>
     </style>
 
     <!-- Estilos para toasts de resposta -->
     <style name="CorrectAnswerToast">
         <item name="android:background">@drawable/bg_toast_correct</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <style name="WrongAnswerToast">
         <item name="android:background">@drawable/bg_toast_wrong</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
     <!-- Estilos para Bottom Navigation -->
@@ -69,7 +74,7 @@
 
     <!-- Estilos para Navigation Drawer -->
     <style name="AppTheme.NavigationDrawer">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:paddingStart">16dp</item>
@@ -77,7 +82,7 @@
     </style>
 
     <style name="DrawerHeaderText">
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -89,7 +94,7 @@
     </style>
 
     <style name="DrawerSubheaderText">
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/drawer_subheader_text</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAllCaps">false</item>
@@ -98,7 +103,7 @@
     </style>
 
     <style name="NavigationMenuTextAppearance">
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textSize">16sp</item>
         <item name="android:fontFamily">@font/inter_medium_ttf</item>
         <item name="android:textStyle">normal</item>
@@ -108,9 +113,9 @@
         <item name="itemTextAppearance">@style/NavigationMenuTextAppearance</item>
         <item name="subheaderTextAppearance">@style/DrawerSubheaderText</item>
         <item name="android:background">@color/colorPrimary</item>
-        <item name="itemTextColor">#FFFFFF</item>
-        <item name="itemIconTint">#FFFFFF</item>
-        <item name="subheaderColor">#FFFFFF</item>
+        <item name="itemTextColor">@color/white</item>
+        <item name="itemIconTint">@color/white</item>
+        <item name="subheaderColor">@color/white</item>
     </style>
 
     <!-- Estilos para diálogos customizados -->
@@ -125,7 +130,7 @@
     </style>
 
     <style name="CustomDialogTitle">
-        <item name="android:textColor">#1F2937</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -144,7 +149,7 @@
     <!-- Estilos para PopupMenu -->
     <style name="CustomPopupMenu" parent="Widget.AppCompat.PopupMenu">
         <item name="android:popupBackground">@drawable/popup_menu_background</item>
-        <item name="android:textColor">#1F2937</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">16sp</item>
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
@@ -164,4 +169,153 @@
         <item name="android:windowExitAnimation">@anim/dialog_exit</item>
     </style>
 
+    <!-- ESTILOS PARA TIME PICKER E DATE PICKER -->
+
+    <!-- Custom Time Picker Dialog -->
+    <style name="CustomTimePickerDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="colorAccent">@color/volans_blue</item>
+        <item name="android:colorAccent">@color/volans_blue</item>
+        <item name="colorControlActivated">@color/volans_blue</item>
+        <item name="android:colorControlActivated">@color/volans_blue</item>
+        <item name="colorControlHighlight">@color/volans_blue</item>
+        <item name="android:colorControlHighlight">@color/volans_blue</item>
+        <item name="colorControlNormal">@color/volans_blue</item>
+        <item name="android:colorControlNormal">@color/volans_blue</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/volans_blue</item>
+    </style>
+
+    <!-- Custom Time Picker Style -->
+    <style name="CustomTimePickerStyle">
+        <item name="android:timePickerMode">clock</item>
+        <item name="android:headerBackground">@color/volans_blue</item>
+        <item name="android:numbersTextColor">@color/white</item>
+        <item name="android:numbersSelectorColor">@color/volans_blue</item>
+        <item name="android:numbersBackgroundColor">@color/white</item>
+        <item name="android:amPmTextColor">@color/white</item>
+        <item name="android:colorControlActivated">@color/volans_blue</item>
+        <item name="android:colorAccent">@color/volans_blue</item>
+        <item name="android:colorControlHighlight">@color/volans_blue</item>
+        <item name="android:colorControlNormal">@color/volans_blue</item>
+        <item name="android:textColorPrimary">@color/white</item>
+        <item name="android:textColorSecondary">@color/white</item>
+        <item name="android:headerTimeTextAppearance">@style/TimePickerHeaderText</item>
+    </style>
+
+    <!-- Custom Time Picker Header Text -->
+    <style name="TimePickerHeaderText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">60sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <!-- Custom Date Picker Dialog -->
+    <style name="CustomDatePickerDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowMinWidthMajor">90%</item>
+        <item name="android:windowMinWidthMinor">90%</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="colorAccent">@color/volans_blue</item>
+        <item name="android:colorAccent">@color/volans_blue</item>
+        <item name="colorControlActivated">@color/volans_blue</item>
+        <item name="android:colorControlActivated">@color/volans_blue</item>
+        <item name="colorControlHighlight">@color/volans_blue</item>
+        <item name="android:colorControlHighlight">@color/volans_blue</item>
+        <item name="colorControlNormal">@color/volans_blue</item>
+        <item name="android:colorControlNormal">@color/volans_blue</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/volans_blue</item>
+    </style>
+
+    <!-- Custom Date Picker Style -->
+    <style name="CustomDatePickerStyle">
+        <item name="android:calendarViewShown">true</item>
+        <item name="android:datePickerMode">calendar</item>
+        <item name="android:headerBackground">@color/volans_blue</item>
+        <item name="android:dayOfWeekBackground">@color/white</item>
+        <item name="android:dayOfWeekTextAppearance">@style/DatePickerDayOfWeekText</item>
+        <item name="android:headerMonthTextAppearance">@style/DatePickerMonthText</item>
+        <item name="android:headerDayOfMonthTextAppearance">@style/DatePickerDayText</item>
+        <item name="android:headerYearTextAppearance">@style/DatePickerYearText</item>
+        <item name="android:yearListSelectorColor">@color/volans_blue</item>
+        <item name="android:colorControlActivated">@color/volans_blue</item>
+        <item name="android:colorAccent">@color/volans_blue</item>
+        <item name="android:colorControlHighlight">@color/volans_blue</item>
+        <item name="android:colorControlNormal">@color/volans_blue</item>
+        <item name="android:calendarTextColor">@color/text_primary</item>
+        <item name="android:datePickerDialogTheme">@style/CustomDatePickerDialog</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/volans_blue</item>
+    </style>
+
+    <!-- Date Picker Text Styles -->
+    <style name="DatePickerDayOfWeekText">
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="DatePickerMonthText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DatePickerDayText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="DatePickerYearText">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <!-- Radio Button Theme -->
+    <style name="RadioButtonTheme">
+        <item name="colorAccent">@color/volans_blue</item>
+        <item name="colorControlActivated">@color/volans_blue</item>
+        <item name="colorControlNormal">@color/radio_button_unselected</item>
+        <item name="android:colorAccent">@color/volans_blue</item>
+        <item name="android:colorControlActivated">@color/volans_blue</item>
+        <item name="android:colorControlNormal">@color/radio_button_unselected</item>
+    </style>
+
+    <!-- ESTILO PARA RADIO BUTTONS DE MODALIDADE -->
+    <style name="ModalidadeRadioButton" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="android:buttonTint">@color/volans_blue</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:background">@drawable/radio_button_background_selector</item>
+        <item name="colorControlActivated">@color/volans_blue</item>
+        <item name="colorControlNormal">@color/radio_button_unselected</item>
+    </style>
+
+    <!-- Estilos para pickers invisíveis (usados para funcionalidade) -->
+    <style name="InvisibleTimePickerStyle" parent="CustomTimePickerStyle">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:headerBackground">@android:color/transparent</item>
+        <item name="android:numbersBackgroundColor">@android:color/transparent</item>
+        <item name="android:numbersTextColor">@android:color/transparent</item>
+        <item name="android:numbersSelectorColor">@color/volans_blue</item>
+        <item name="android:amPmTextColor">@android:color/transparent</item>
+    </style>
+
+    <style name="InvisibleDatePickerStyle" parent="CustomDatePickerStyle">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:headerBackground">@android:color/transparent</item>
+        <item name="android:dayOfWeekBackground">@android:color/transparent</item>
+        <item name="android:calendarTextColor">@android:color/transparent</item>
+        <item name="android:yearListSelectorColor">@color/volans_blue</item>
+    </style>
 </resources>

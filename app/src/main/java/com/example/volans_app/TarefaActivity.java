@@ -2,8 +2,10 @@ package com.example.volans_app;
 
 import android.animation.ValueAnimator;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,6 +14,8 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -19,13 +23,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -54,6 +61,8 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -72,10 +81,6 @@ public class TarefaActivity extends AppCompatActivity implements
     private FloatingActionButton fabAddTarefa;
     private TextView tvTarefaCount, tvTarefasPendentes, tvTarefasConcluidas;
     private LinearLayout layoutEmptyState;
-
-    // Filtros
-    private ChipGroup chipGroupFiltros;
-    private Chip chipTodas, chipPendentes, chipConcluidas, chipAtrasadas;
 
     // Navigation
     private DrawerLayout drawerLayout;
@@ -107,7 +112,6 @@ public class TarefaActivity extends AppCompatActivity implements
         setupRecyclerView();
         setupFab();
         setupQuickAction();
-        setupFilters();
         setupUserData();
         loadTarefas();
         updateCounters();
@@ -136,13 +140,6 @@ public class TarefaActivity extends AppCompatActivity implements
         tvTarefasPendentes = findViewById(R.id.tvTarefasPendentes);
         tvTarefasConcluidas = findViewById(R.id.tvTarefasConcluidas);
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
-
-        // Filtros
-        chipGroupFiltros = findViewById(R.id.chipGroupFiltros);
-        chipTodas = findViewById(R.id.chipTodas);
-        chipPendentes = findViewById(R.id.chipPendentes);
-        chipConcluidas = findViewById(R.id.chipConcluidas);
-        chipAtrasadas = findViewById(R.id.chipAtrasadas);
 
         // Navigation
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -220,127 +217,274 @@ public class TarefaActivity extends AppCompatActivity implements
     }
 
     private void showTarefaDialog(String titulo, String botaoTexto, Tarefa tarefaExistente) {
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_add_tarefa, null);
+        try {
+            // Criar um layout inflater personalizado
+            LayoutInflater inflater = LayoutInflater.from(this);
+            View dialogView = inflater.inflate(R.layout.dialog_add_tarefa, null);
 
-        AlertDialog dialog = new AlertDialog.Builder(this, R.style.CustomAlertDialog)
-                .setView(dialogView)
-                .create();
+            // Criar um diálogo personalizado
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(dialogView);
 
-        // Configurar views do diálogo
-        TextView tvTituloDialog = dialogView.findViewById(R.id.tvTituloDialog);
-        ChipGroup chipGroupDias = dialogView.findViewById(R.id.chipGroupDias);
-        TextInputEditText etTitulo = dialogView.findViewById(R.id.etTitulo);
-        TextInputEditText etHorario = dialogView.findViewById(R.id.etHorario);
-        TextInputEditText etDataLimite = dialogView.findViewById(R.id.etDataLimite);
-        TextInputEditText etProfessor = dialogView.findViewById(R.id.etProfessor);
-        RadioButton rbPresencial = dialogView.findViewById(R.id.rbPresencial);
-        RadioButton rbEAD = dialogView.findViewById(R.id.rbEAD);
-        MaterialButton btnCancelar = dialogView.findViewById(R.id.btnCancelar);
-        MaterialButton btnSalvar = dialogView.findViewById(R.id.btnSalvar);
-
-        // Configurar título e texto do botão
-        tvTituloDialog.setText(titulo);
-        btnSalvar.setText(botaoTexto);
-
-        // Preencher dados se for edição
-        if (tarefaExistente != null) {
-            etTitulo.setText(tarefaExistente.getTitulo());
-            etHorario.setText(tarefaExistente.getHorario());
-            etDataLimite.setText(tarefaExistente.getDataLimite());
-            etProfessor.setText(tarefaExistente.getProfessor());
-
-            if (tarefaExistente.getModalidade().equals("Presencial")) {
-                rbPresencial.setChecked(true);
-            } else {
-                rbEAD.setChecked(true);
+            // Configurar a janela do diálogo
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             }
 
-            // Selecionar o dia da semana
-            String diaSemana = tarefaExistente.getDiaSemana();
-            for (int i = 0; i < chipGroupDias.getChildCount(); i++) {
-                Chip chip = (Chip) chipGroupDias.getChildAt(i);
-                if (chip.getText().toString().equals(diaSemana)) {
-                    chip.setChecked(true);
-                    break;
+            // Configurar views do diálogo
+            TextView tvTituloDialog = dialogView.findViewById(R.id.tvTituloDialog);
+            ChipGroup chipGroupDias = dialogView.findViewById(R.id.chipGroupDias);
+            TextInputEditText etTitulo = dialogView.findViewById(R.id.etTitulo);
+            TextInputEditText etHorario = dialogView.findViewById(R.id.etHorario);
+            TextInputEditText etDataLimite = dialogView.findViewById(R.id.etDataLimite);
+            TextInputEditText etProfessor = dialogView.findViewById(R.id.etProfessor);
+            RadioGroup radioGroupModalidade = dialogView.findViewById(R.id.radioGroupModalidade);
+            RadioButton rbPresencial = dialogView.findViewById(R.id.rbPresencial);
+            RadioButton rbEAD = dialogView.findViewById(R.id.rbEAD);
+            MaterialButton btnCancelar = dialogView.findViewById(R.id.btnCancelar);
+            MaterialButton btnSalvar = dialogView.findViewById(R.id.btnSalvar);
+
+            // Configurar título e texto do botão
+            tvTituloDialog.setText(titulo);
+            btnSalvar.setText(botaoTexto);
+
+            // CORREÇÃO: Configurar radio buttons corretamente
+            int volansBlue = getResources().getColor(R.color.volans_blue);
+            rbPresencial.setButtonTintList(ColorStateList.valueOf(volansBlue));
+            rbEAD.setButtonTintList(ColorStateList.valueOf(volansBlue));
+
+            // CORREÇÃO: Limpar seleções primeiro
+            radioGroupModalidade.clearCheck();
+
+            // CORREÇÃO: Configurar listener ANTES de definir valores iniciais
+            radioGroupModalidade.setOnCheckedChangeListener((group, checkedId) -> {
+                // Garantir seleção única
+                if (checkedId == R.id.rbPresencial) {
+                    rbEAD.setChecked(false);
+                    Log.d(TAG, "Presencial selecionado");
+                } else if (checkedId == R.id.rbEAD) {
+                    rbPresencial.setChecked(false);
+                    Log.d(TAG, "EAD selecionado");
                 }
-            }
-        }
+            });
 
-        // Configurar listeners para seletores de tempo e data
-        etHorario.setOnClickListener(v -> showTimePicker(etHorario));
-        etDataLimite.setOnClickListener(v -> showDatePicker(etDataLimite));
+            // Preencher dados se for edição
+            if (tarefaExistente != null) {
+                etTitulo.setText(tarefaExistente.getTitulo());
+                etHorario.setText(tarefaExistente.getHorario());
+                etDataLimite.setText(tarefaExistente.getDataLimite());
+                etProfessor.setText(tarefaExistente.getProfessor());
 
-        // Configurar botão Cancelar
-        btnCancelar.setOnClickListener(v -> dialog.dismiss());
+                // CORREÇÃO: Definir modalidade usando o RadioGroup
+                if (tarefaExistente.getModalidade().equals("Presencial")) {
+                    radioGroupModalidade.check(R.id.rbPresencial);
+                } else {
+                    radioGroupModalidade.check(R.id.rbEAD);
+                }
 
-        // Configurar botão Salvar/Criar
-        btnSalvar.setOnClickListener(v -> {
-            String tituloTarefa = etTitulo.getText().toString().trim();
-            String diaSelecionado = getDiaSelecionado(chipGroupDias);
-            String horario = etHorario.getText().toString().trim();
-            String dataLimite = etDataLimite.getText().toString().trim();
-            String professor = etProfessor.getText().toString().trim();
-            String modalidade = rbPresencial.isChecked() ? "Presencial" : "EAD";
-
-            if (tituloTarefa.isEmpty() || diaSelecionado.isEmpty() || horario.isEmpty() || dataLimite.isEmpty()) {
-                Toast.makeText(this, "Preencha todos os campos obrigatórios", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            if (tarefaEditando == null) {
-                // Criar nova tarefa
-                Tarefa novaTarefa = new Tarefa(tituloTarefa, diaSelecionado, horario, dataLimite, modalidade, professor);
-                listaTarefas.add(novaTarefa);
-                tarefaAdapter.notifyItemInserted(listaTarefas.size() - 1);
-                Toast.makeText(this, "Tarefa criada com sucesso!", Toast.LENGTH_SHORT).show();
+                // Selecionar o dia da semana
+                String diaSemana = tarefaExistente.getDiaSemana();
+                for (int i = 0; i < chipGroupDias.getChildCount(); i++) {
+                    View child = chipGroupDias.getChildAt(i);
+                    if (child instanceof Chip) {
+                        Chip chip = (Chip) child;
+                        if (chip.getText().toString().equals(diaSemana)) {
+                            chip.setChecked(true);
+                            break;
+                        }
+                    }
+                }
             } else {
-                // Editar tarefa existente
-                tarefaEditando.setTitulo(tituloTarefa);
-                tarefaEditando.setDiaSemana(diaSelecionado);
-                tarefaEditando.setHorario(horario);
-                tarefaEditando.setDataLimite(dataLimite);
-                tarefaEditando.setModalidade(modalidade);
-                tarefaEditando.setProfessor(professor);
-
-                tarefaAdapter.notifyItemChanged(posicaoEditando);
-                Toast.makeText(this, "Tarefa atualizada com sucesso!", Toast.LENGTH_SHORT).show();
+                // CORREÇÃO: Para nova tarefa, definir Presencial como padrão usando RadioGroup
+                radioGroupModalidade.check(R.id.rbPresencial);
             }
 
-            updateCounters();
-            updateEmptyState();
-            dialog.dismiss();
-        });
+            // Configurar listeners para seletores de tempo e data
+            etHorario.setOnClickListener(v -> showTimePicker(etHorario));
+            etDataLimite.setOnClickListener(v -> showDatePicker(etDataLimite));
 
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(R.drawable.dialog_background);
+            // Configurar botão Cancelar
+            btnCancelar.setOnClickListener(v -> dialog.dismiss());
+
+            // Configurar botão Salvar/Criar
+            btnSalvar.setOnClickListener(v -> {
+                String tituloTarefa = etTitulo.getText().toString().trim();
+                String diaSelecionado = getDiaSelecionado(chipGroupDias);
+                String horario = etHorario.getText().toString().trim();
+                String dataLimite = etDataLimite.getText().toString().trim();
+                String professor = etProfessor.getText().toString().trim();
+
+                // CORREÇÃO: Determinar modalidade selecionada usando RadioGroup de forma mais robusta
+                String modalidade = "Presencial"; // padrão
+                if (radioGroupModalidade != null) {
+                    int checkedId = radioGroupModalidade.getCheckedRadioButtonId();
+                    if (checkedId == R.id.rbEAD) {
+                        modalidade = "EAD";
+                    } else if (checkedId == R.id.rbPresencial) {
+                        modalidade = "Presencial";
+                    }
+                    Log.d(TAG, "Modalidade selecionada: " + modalidade);
+                }
+
+                if (tituloTarefa.isEmpty() || diaSelecionado.isEmpty() || horario.isEmpty() || dataLimite.isEmpty()) {
+                    Toast.makeText(this, "Preencha todos os campos obrigatórios", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (tarefaEditando == null) {
+                    // Criar nova tarefa
+                    Tarefa novaTarefa = new Tarefa(tituloTarefa, diaSelecionado, horario, dataLimite, modalidade, professor);
+                    listaTarefas.add(novaTarefa);
+                    tarefaAdapter.notifyItemInserted(listaTarefas.size() - 1);
+                    Toast.makeText(this, "Tarefa criada com sucesso!", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Editar tarefa existente
+                    tarefaEditando.setTitulo(tituloTarefa);
+                    tarefaEditando.setDiaSemana(diaSelecionado);
+                    tarefaEditando.setHorario(horario);
+                    tarefaEditando.setDataLimite(dataLimite);
+                    tarefaEditando.setModalidade(modalidade);
+                    tarefaEditando.setProfessor(professor);
+
+                    tarefaAdapter.notifyItemChanged(posicaoEditando);
+                    Toast.makeText(this, "Tarefa atualizada com sucesso!", Toast.LENGTH_SHORT).show();
+                }
+
+                updateCounters();
+                updateEmptyState();
+                saveTarefas(); // CORREÇÃO: Salvar tarefas após criar/editar
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao mostrar diálogo: ", e);
+            Toast.makeText(this, "Erro ao abrir o diálogo: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
-
-        dialog.show();
     }
 
     private String getDiaSelecionado(ChipGroup chipGroup) {
-        int selectedId = chipGroup.getCheckedChipId();
-        if (selectedId != View.NO_ID) {
-            Chip selectedChip = chipGroup.findViewById(selectedId);
-            if (selectedChip != null) {
-                return selectedChip.getText().toString();
+        try {
+            // Percorrer todos os chips para encontrar o selecionado
+            for (int i = 0; i < chipGroup.getChildCount(); i++) {
+                View child = chipGroup.getChildAt(i);
+                if (child instanceof Chip) {
+                    Chip chip = (Chip) child;
+                    if (chip.isChecked()) {
+                        return chip.getText().toString();
+                    }
+                }
             }
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao obter dia selecionado: ", e);
         }
+
         return "";
     }
 
     private void showTimePicker(TextInputEditText editText) {
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
+        try {
+            // Inflar o layout personalizado
+            View dialogView = getLayoutInflater().inflate(R.layout.custom_time_picker, null);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                (TimePicker view, int hourOfDay, int minuteOfHour) -> {
-                    String time = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minuteOfHour);
-                    editText.setText(time);
-                }, hour, minute, true);
+            // Criar o diálogo
+            Dialog dialog = new Dialog(this, R.style.CustomTimePickerDialog);
+            dialog.setContentView(dialogView);
 
-        timePickerDialog.show();
+            // Configurar a janela do diálogo
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+
+            // Inicializar componentes
+            TimePicker timePicker = dialogView.findViewById(R.id.timePicker);
+            TextView tvTimeHeader = dialogView.findViewById(R.id.tvTimeHeader);
+            Button btnCancelTime = dialogView.findViewById(R.id.btnCancelTime);
+            Button btnOkTime = dialogView.findViewById(R.id.btnOkTime);
+
+            // Configurar TimePicker
+            timePicker.setIs24HourView(true);
+
+            // CORREÇÃO: Aplicar cores personalizadas - SEMPRE BRANCO COM #404CCF
+            int volansBlueColor = getResources().getColor(R.color.volans_blue);
+            int whiteColor = getResources().getColor(R.color.white);
+
+            // Forçar cores independente do tema
+            tvTimeHeader.setTextColor(whiteColor);
+            btnCancelTime.setTextColor(volansBlueColor);
+            btnOkTime.setTextColor(volansBlueColor);
+
+            // Tentar aplicar a cor ao seletor do TimePicker usando reflexão
+            try {
+                Field[] timePickerFields = TimePicker.class.getDeclaredFields();
+                for (Field field : timePickerFields) {
+                    if (field.getName().contains("mSelectionDivider") ||
+                            field.getName().contains("selectionDivider") ||
+                            field.getName().contains("mSelectorWheelPaint")) {
+                        field.setAccessible(true);
+                        Object divider = field.get(timePicker);
+                        if (divider instanceof Drawable) {
+                            ((Drawable) divider).setColorFilter(volansBlueColor, PorterDuff.Mode.SRC_IN);
+                        } else if (divider instanceof Paint) {
+                            ((Paint) divider).setColor(volansBlueColor);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Não foi possível personalizar a cor do seletor do TimePicker", e);
+            }
+
+            // Obter hora atual
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            // Configurar hora inicial
+            timePicker.setHour(hour);
+            timePicker.setMinute(minute);
+
+            // Atualizar o cabeçalho
+            updateTimeHeader(tvTimeHeader, hour, minute);
+
+            // Listener para atualizar o cabeçalho quando o tempo mudar
+            timePicker.setOnTimeChangedListener((view, hourOfDay, minuteOfHour) -> {
+                updateTimeHeader(tvTimeHeader, hourOfDay, minuteOfHour);
+            });
+
+            // Configurar botões
+            btnCancelTime.setOnClickListener(v -> dialog.dismiss());
+
+            btnOkTime.setOnClickListener(v -> {
+                int selectedHour = timePicker.getHour();
+                int selectedMinute = timePicker.getMinute();
+                String time = String.format(Locale.getDefault(), "%02d:%02d", selectedHour, selectedMinute);
+                editText.setText(time);
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao mostrar seletor de tempo: ", e);
+            // Fallback para o seletor padrão
+            Calendar calendar = Calendar.getInstance();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int minute = calendar.get(Calendar.MINUTE);
+
+            TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                    (TimePicker view, int hourOfDay, int minuteOfHour) -> {
+                        String time = String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minuteOfHour);
+                        editText.setText(time);
+                    }, hour, minute, true);
+
+            timePickerDialog.show();
+        }
+    }
+
+    private void updateTimeHeader(TextView tvTimeHeader, int hour, int minute) {
+        String timeText = String.format(Locale.getDefault(), "%02d:%02d", hour, minute);
+        tvTimeHeader.setText(timeText);
     }
 
     private void showDatePicker(TextInputEditText editText) {
@@ -357,39 +501,6 @@ public class TarefaActivity extends AppCompatActivity implements
                 }, year, month, day);
 
         datePickerDialog.show();
-    }
-
-    private void setupFilters() {
-        chipTodas.setOnClickListener(v -> {
-            tarefaAdapter.filterByStatus("Todas");
-            updateChipSelection(chipTodas);
-        });
-
-        chipPendentes.setOnClickListener(v -> {
-            tarefaAdapter.filterByStatus("Pendentes");
-            updateChipSelection(chipPendentes);
-        });
-
-        chipConcluidas.setOnClickListener(v -> {
-            tarefaAdapter.filterByStatus("Concluídas");
-            updateChipSelection(chipConcluidas);
-        });
-
-        chipAtrasadas.setOnClickListener(v -> {
-            tarefaAdapter.filterByStatus("Atrasadas");
-            updateChipSelection(chipAtrasadas);
-        });
-
-        // Selecionar "Todas" por padrão
-        updateChipSelection(chipTodas);
-    }
-
-    private void updateChipSelection(Chip selectedChip) {
-        chipTodas.setChecked(false);
-        chipPendentes.setChecked(false);
-        chipConcluidas.setChecked(false);
-        chipAtrasadas.setChecked(false);
-        selectedChip.setChecked(true);
     }
 
     private void setupDrawer() {
@@ -649,13 +760,37 @@ public class TarefaActivity extends AppCompatActivity implements
         recyclerViewTarefas.setAdapter(tarefaAdapter);
     }
 
+    // CORREÇÃO: Método loadTarefas completo com integração ao SharedPreferences
     private void loadTarefas() {
-        // Carregar tarefas de exemplo
-        listaTarefas.add(new Tarefa("Entrega do Projeto Final", "Quinta", "19:00", "30/05/2024", "Presencial", "Prof. Silva"));
-        listaTarefas.add(new Tarefa("Prova de Matemática", "Sexta", "14:00", "02/06/2024", "EAD", "Prof. Santos"));
-        listaTarefas.add(new Tarefa("Apresentação TCC", "Segunda", "08:00", "15/05/2024", "Presencial", "Prof. Costa"));
+        // Carregar tarefas do SharedPreferences
+        List<Tarefa> tarefasSalvas = SharedPrefManager.getInstance(this).getTarefas();
+        if (tarefasSalvas != null && !tarefasSalvas.isEmpty()) {
+            listaTarefas.clear();
+            listaTarefas.addAll(tarefasSalvas);
+            Log.d(TAG, "Carregadas " + tarefasSalvas.size() + " tarefas do SharedPreferences");
+        } else {
+            // Carregar tarefas de exemplo se não houver tarefas salvas
+            listaTarefas.add(new Tarefa("Entrega do Projeto Final", "Quinta", "19:00", "30/05/2024", "Presencial", "Prof. Silva"));
+            listaTarefas.add(new Tarefa("Prova de Matemática", "Sexta", "14:00", "02/06/2024", "EAD", "Prof. Santos"));
+            listaTarefas.add(new Tarefa("Apresentação TCC", "Segunda", "08:00", "15/05/2024", "Presencial", "Prof. Costa"));
+            Log.d(TAG, "Carregadas tarefas de exemplo");
+
+            // Salvar as tarefas de exemplo
+            saveTarefas();
+        }
         tarefaAdapter.notifyDataSetChanged();
         updateEmptyState();
+    }
+
+    // CORREÇÃO: Método saveTarefas implementado
+    private void saveTarefas() {
+        try {
+            SharedPrefManager.getInstance(this).saveTarefas(listaTarefas);
+            Log.d(TAG, "Tarefas salvas com sucesso: " + listaTarefas.size() + " tarefas");
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao salvar tarefas", e);
+            Toast.makeText(this, "Erro ao salvar tarefas", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void updateCounters() {
@@ -726,6 +861,7 @@ public class TarefaActivity extends AppCompatActivity implements
             tarefaAdapter.notifyItemRemoved(position);
             updateCounters();
             updateEmptyState();
+            saveTarefas(); // CORREÇÃO: Salvar após excluir
             Toast.makeText(this, "Tarefa excluída com sucesso!", Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
@@ -745,6 +881,7 @@ public class TarefaActivity extends AppCompatActivity implements
     @Override
     public void onTarefaToggleComplete(Tarefa tarefa, int position) {
         updateCounters();
+        saveTarefas(); // CORREÇÃO: Salvar após alterar status
         String status = tarefa.isConcluida() ? "concluída" : "reaberta";
         Toast.makeText(this, "Tarefa " + status + "!", Toast.LENGTH_SHORT).show();
     }

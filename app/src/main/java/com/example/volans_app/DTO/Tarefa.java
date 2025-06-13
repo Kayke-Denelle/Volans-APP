@@ -1,20 +1,20 @@
 package com.example.volans_app.DTO;
 
 public class Tarefa {
+    private String id;
     private String titulo;
     private String diaSemana;
     private String horario;
     private String dataLimite;
-    private String modalidade;
     private String professor;
-    private boolean concluida;
+    private String modalidade;
+    private String status;
 
-    // Construtor vazio para criação de novas tarefas
     public Tarefa() {
-        this.concluida = false;
+        // Construtor vazio necessário
     }
 
-    // Construtor completo
+    // Construtor completo para criar novas tarefas
     public Tarefa(String titulo, String diaSemana, String horario, String dataLimite, String modalidade, String professor) {
         this.titulo = titulo;
         this.diaSemana = diaSemana;
@@ -22,64 +22,74 @@ public class Tarefa {
         this.dataLimite = dataLimite;
         this.modalidade = modalidade;
         this.professor = professor;
-        this.concluida = false;
+        this.status = "Pendente"; // Status padrão para novas tarefas
     }
 
-    // Getters
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public String getTitulo() {
         return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getDiaSemana() {
         return diaSemana;
     }
 
-    public String getHorario() {
-        return horario;
-    }
-
-    public String getDataLimite() {
-        return dataLimite;
-    }
-
-    public String getModalidade() {
-        return modalidade;
-    }
-
-    public String getProfessor() {
-        return professor;
-    }
-
-    public boolean isConcluida() {
-        return concluida;
-    }
-
-    // Setters
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
     public void setDiaSemana(String diaSemana) {
         this.diaSemana = diaSemana;
+    }
+
+    public String getHorario() {
+        return horario;
     }
 
     public void setHorario(String horario) {
         this.horario = horario;
     }
 
+    public String getDataLimite() {
+        return dataLimite;
+    }
+
     public void setDataLimite(String dataLimite) {
         this.dataLimite = dataLimite;
     }
 
-    public void setModalidade(String modalidade) {
-        this.modalidade = modalidade;
+    public String getProfessor() {
+        return professor;
     }
 
     public void setProfessor(String professor) {
         this.professor = professor;
     }
 
-    public void setConcluida(boolean concluida) {
-        this.concluida = concluida;
+    public String getModalidade() {
+        return modalidade;
+    }
+
+    public void setModalidade(String modalidade) {
+        this.modalidade = modalidade;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public boolean isConcluida() {
+        return "Concluída".equals(status);
     }
 }

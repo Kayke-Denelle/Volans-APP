@@ -197,7 +197,9 @@
                     android:hint="Nome do baralho"
                     android:inputType="text"
                     android:maxLines="1"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textColor="#1F2937"
+                    android:textColorHint="#6B7280" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -220,7 +222,9 @@
                     android:inputType="textMultiLine"
                     android:maxLines="3"
                     android:minLines="2"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:textColor="#1F2937"
+                    android:textColorHint="#6B7280" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

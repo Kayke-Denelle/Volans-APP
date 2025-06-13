@@ -101,7 +101,7 @@
                     android:layout_marginTop="24dp"
                     android:layout_marginBottom="24dp"
                     app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#5B4CF5"
+                    app:cardBackgroundColor="#404CCF"
                     app:cardElevation="0dp"
                     android:clickable="true"
                     android:focusable="true">
@@ -150,7 +150,7 @@
                                 android:layout_height="24dp"
                                 android:layout_gravity="center"
                                 android:src="@drawable/ic_add"
-                                app:tint="#5B4CF5" />
+                                app:tint="#404CCF" />
 
                         </androidx.cardview.widget.CardView>
 
@@ -246,77 +246,6 @@
 
                 </LinearLayout>
 
-                <!-- Filtros de Tarefas -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="20dp"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    app:cardElevation="0dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Filtrar por:"
-                            android:textColor="#1F2937"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:layout_marginBottom="12dp" />
-
-                        <com.google.android.material.chip.ChipGroup
-                            android:id="@+id/chipGroupFiltros"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            app:singleSelection="true"
-                            app:chipSpacingHorizontal="8dp">
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipTodas"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Todas"
-                                android:checkable="true"
-                                android:checked="true"
-                                style="@style/Widget.MaterialComponents.Chip.Filter" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipPendentes"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Pendentes"
-                                android:checkable="true"
-                                style="@style/Widget.MaterialComponents.Chip.Filter" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipConcluidas"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Concluídas"
-                                android:checkable="true"
-                                style="@style/Widget.MaterialComponents.Chip.Filter" />
-
-                            <com.google.android.material.chip.Chip
-                                android:id="@+id/chipAtrasadas"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Atrasadas"
-                                android:checkable="true"
-                                style="@style/Widget.MaterialComponents.Chip.Filter" />
-
-                        </com.google.android.material.chip.ChipGroup>
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
                 <!-- Lista de Tarefas -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -352,7 +281,7 @@
                                     android:layout_height="24dp"
                                     android:layout_gravity="center"
                                     android:src="@drawable/ic_tarefas"
-                                    app:tint="#5B4CF5" />
+                                    app:tint="#404CCF" />
 
                             </androidx.cardview.widget.CardView>
 
@@ -441,7 +370,7 @@
             android:layout_marginBottom="90dp"
             android:src="@drawable/ic_add"
             android:contentDescription="Adicionar tarefa"
-            app:backgroundTint="#5B4CF5"
+            app:backgroundTint="#404CCF"
             app:tint="#FFFFFF" />
 
         <!-- Bottom Navigation -->

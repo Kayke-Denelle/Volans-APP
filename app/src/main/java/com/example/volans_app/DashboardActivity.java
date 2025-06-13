@@ -434,7 +434,12 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         if (quickActionCreate != null) {
             quickActionCreate.setOnClickListener(v -> {
                 animateQuickAction(quickActionCreate);
-                navigateToActivity(AtividadeActivity.class);
+                // Criar intent com flag extra para abrir o diálogo de criação
+                Intent intent = new Intent(this, BaralhoActivity.class);
+                intent.putExtra("openCreateDialog", true);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                Log.d(TAG, "Navegando para BaralhoActivity com flag para abrir diálogo de criação");
             });
         }
     }

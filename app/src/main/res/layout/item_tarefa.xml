@@ -1,412 +1,203 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="8dp"
-    app:cardBackgroundColor="#FFFFFF"
-    android:clickable="true"
-    android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground">
-
-    <!-- Gradiente sutil de fundo -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/card_gradient_background" />
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:padding="16dp">
 
-        <!-- Header com checkbox, título e ações -->
+        <!-- Cabeçalho com título e checkbox -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="8dp">
 
-            <!-- Checkbox customizado -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="2dp"
-                app:cardBackgroundColor="#F8FAFF"
-                android:layout_marginEnd="12dp">
+            <CheckBox
+                android:id="@+id/checkBoxTarefa"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:buttonTint="@color/volans_blue"
+                android:layout_marginEnd="12dp" />
 
-                <CheckBox
-                    android:id="@+id/cbConcluida"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center"
-                    android:button="@null"
-                    android:background="@drawable/checkbox_custom"
-                    android:buttonTint="#404CCF" />
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Título com indicador de prioridade -->
-            <LinearLayout
+            <TextView
+                android:id="@+id/tvTituloTarefa"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:text="Título da Tarefa"
+                android:textColor="@color/text_primary"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:ellipsize="end"
+                android:maxLines="2" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+            <ImageButton
+                android:id="@+id/btnEditTarefa"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_edit"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                app:tint="@color/volans_blue"
+                android:contentDescription="Editar tarefa" />
 
-                    <TextView
-                        android:id="@+id/tvTitulo"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Título da Tarefa"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#1F2937"
-                        android:maxLines="2"
-                        android:ellipsize="end"
-                        android:lineSpacingExtra="2dp" />
-
-                    <!-- Indicador de prioridade/status -->
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/cvPrioridade"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        app:cardCornerRadius="12dp"
-                        app:cardElevation="0dp"
-                        app:cardBackgroundColor="#FFE4E1"
-                        android:layout_marginStart="8dp"
-                        android:visibility="gone">
-
-                        <ImageView
-                            android:id="@+id/ivPrioridade"
-                            android:layout_width="14dp"
-                            android:layout_height="14dp"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_warning"
-                            app:tint="#EF4444" />
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-                <!-- Status badge -->
-                <TextView
-                    android:id="@+id/tvStatus"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pendente"
-                    android:textSize="11sp"
-                    android:textColor="#404CCF"
-                    android:textStyle="bold"
-                    android:background="@drawable/status_badge_background"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
-                    android:layout_marginTop="4dp"
-                    android:visibility="gone" />
-
-            </LinearLayout>
-
-            <!-- Botões de ação -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginStart="12dp">
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="#F0F4FF"
-                    android:layout_marginEnd="8dp">
-
-                    <ImageView
-                        android:id="@+id/ivEdit"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_edit"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#404CCF"
-                        android:contentDescription="Editar tarefa" />
-
-                </androidx.cardview.widget.CardView>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    app:cardCornerRadius="18dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="#FFF0F0">
-
-                    <ImageView
-                        android:id="@+id/ivDelete"
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_delete"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        app:tint="#EF4444"
-                        android:contentDescription="Excluir tarefa" />
-
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
-
+            <ImageButton
+                android:id="@+id/btnDeleteTarefa"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_delete"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="6dp"
+                app:tint="@color/red"
+                android:contentDescription="Excluir tarefa" />
         </LinearLayout>
 
-        <!-- Separador elegante -->
+        <!-- Linha divisória -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@drawable/separator_gradient"
-            android:layout_marginBottom="16dp" />
+            android:background="@color/border_light"
+            android:layout_marginBottom="12dp" />
 
-        <!-- Informações principais com ícones elegantes -->
+        <!-- Informações da tarefa -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginBottom="12dp">
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
 
-            <!-- Dia e horário -->
+            <!-- Dia e Horário -->
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
+                android:gravity="center_vertical">
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="#E8F2FF"
-                    android:layout_marginEnd="12dp">
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/volans_blue"
+                    android:layout_marginEnd="8dp" />
 
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_calendar"
-                        app:tint="#404CCF" />
-
-                </androidx.cardview.widget.CardView>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/tvDiaSemana"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Segunda-feira"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="#1F2937" />
-
-                    <TextView
-                        android:id="@+id/tvHorario"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="19:00"
-                        android:textSize="13sp"
-                        android:textColor="#6B7280"
-                        android:layout_marginTop="2dp" />
-
-                </LinearLayout>
-
-                <!-- Badge do dia -->
                 <TextView
+                    android:id="@+id/tvDetalhes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="HOJE"
-                    android:textSize="10sp"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold"
-                    android:background="@drawable/today_badge_background"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp"
-                    android:visibility="gone" />
-
+                    android:text="Quinta • 19:00"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Data limite com destaque -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- Status -->
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="10dp">
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    app:cardCornerRadius="16dp"
-                    app:cardElevation="0dp"
-                    app:cardBackgroundColor="#FFE8E8"
-                    android:layout_marginEnd="12dp">
-
-                    <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/ic_event"
-                        app:tint="#EF4444" />
-
-                </androidx.cardview.widget.CardView>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Data de Entrega"
-                        android:textSize="12sp"
-                        android:textColor="#6B7280"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tvDataLimite"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="30/05/2024"
-                        android:textSize="14sp"
-                        android:textColor="#EF4444"
-                        android:textStyle="bold"
-                        android:layout_marginTop="2dp" />
-
-                </LinearLayout>
-
-                <!-- Contador de dias -->
-                <TextView
-                    android:id="@+id/tvDiasRestantes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="5 dias"
-                    android:textSize="11sp"
-                    android:textColor="#404CCF"
-                    android:textStyle="bold"
-                    android:background="@drawable/days_counter_background"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp" />
-
-            </LinearLayout>
-
+                android:text="Pendente"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:background="@drawable/status_badge_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp" />
         </LinearLayout>
 
-        <!-- Footer com modalidade e professor -->
+        <!-- Data de Entrega -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:background="@drawable/footer_background"
-            android:padding="12dp">
+            android:layout_marginBottom="8dp">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#E8F5E8"
-                android:layout_marginEnd="10dp">
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_deadline"
+                app:tint="@color/red"
+                android:layout_marginEnd="8dp" />
 
-                <ImageView
-                    android:id="@+id/ivModalidade"
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:layout_gravity="center"
-                    android:src="@drawable/ic_presencial"
-                    app:tint="#10B981" />
+            <TextView
+                android:id="@+id/tvDataLimite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Entrega: 30/05/2024"
+                android:textColor="@color/red"
+                android:textSize="14sp" />
 
-            </androidx.cardview.widget.CardView>
+            <TextView
+                android:id="@+id/tvDiasRestantes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="5 dias"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:background="@drawable/days_badge_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="2dp"
+                android:layout_marginStart="8dp" />
+        </LinearLayout>
+
+        <!-- Professor e Modalidade -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:orientation="vertical">
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@color/background_primary"
+                android:padding="8dp"
+                android:layout_marginEnd="8dp">
 
-                <TextView
-                    android:id="@+id/tvModalidade"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Presencial"
-                    android:textSize="13sp"
-                    android:textColor="#10B981"
-                    android:textStyle="bold" />
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_person"
+                    app:tint="@color/volans_blue"
+                    android:layout_marginEnd="8dp" />
 
                 <TextView
                     android:id="@+id/tvProfessor"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Prof. Silva"
-                    android:textSize="12sp"
-                    android:textColor="#6B7280"
-                    android:layout_marginTop="2dp" />
-
+                    android:textColor="@color/text_secondary"
+                    android:textSize="14sp" />
             </LinearLayout>
 
-            <!-- Indicador de conclusão -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cvConclusao"
+            <TextView
+                android:id="@+id/tvModalidade"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#E8F5E8"
-                android:visibility="gone">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp">
-
-                    <ImageView
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:src="@drawable/ic_check"
-                        app:tint="#10B981"
-                        android:layout_marginEnd="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Concluída"
-                        android:textSize="10sp"
-                        android:textColor="#10B981"
-                        android:textStyle="bold" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
+                android:text="Presencial"
+                android:textColor="@color/volans_blue"
+                android:textSize="14sp"
+                android:drawableStart="@drawable/ic_school"
+                android:drawablePadding="4dp"
+                android:drawableTint="@color/volans_blue"
+                android:background="@color/background_primary"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="8dp" />
         </LinearLayout>
-
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

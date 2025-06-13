@@ -21,14 +21,14 @@
             android:layout_height="48dp"
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="@drawable/icon_background_gradient">
+            app:cardBackgroundColor="@color/volans_blue">
 
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center"
                 android:src="@drawable/ic_add_task"
-                app:tint="#FFFFFF" />
+                app:tint="@color/white" />
 
         </androidx.cardview.widget.CardView>
 
@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Criar Nova Tarefa"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_primary"
                 android:textSize="22sp"
                 android:textStyle="bold" />
 
@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Organize suas atividades acadêmicas"
-                android:textColor="#6B7280"
+                android:textColor="@color/text_secondary"
                 android:textSize="14sp"
                 android:layout_marginTop="2dp" />
 
@@ -67,13 +67,13 @@
         android:layout_marginBottom="20dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
-        app:cardBackgroundColor="#F8FAFF">
+        app:cardBackgroundColor="@color/background_primary">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="📝 Título da tarefa"
-            app:hintTextColor="#404CCF"
+            app:hintTextColor="@color/volans_blue"
             app:boxBackgroundMode="none"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="0dp">
@@ -84,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="text"
                 android:maxLines="2"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:padding="16dp" />
 
@@ -111,14 +111,14 @@
                 android:layout_height="32dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#E8F2FF">
+                app:cardBackgroundColor="@color/background_primary">
 
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_calendar"
-                    app:tint="#404CCF" />
+                    app:tint="@color/volans_blue" />
 
             </androidx.cardview.widget.CardView>
 
@@ -127,7 +127,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="Dia da semana"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -146,9 +146,9 @@
                 android:layout_height="wrap_content"
                 android:text="Segunda"
                 android:checkable="true"
-                android:textColor="#404CCF"
+                android:textColor="@color/chip_text_color_selector"
                 app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeColor="#404CCF"
+                app:chipStrokeColor="@color/volans_blue"
                 app:chipStrokeWidth="1dp"
                 app:chipCornerRadius="12dp"
                 style="@style/Widget.MaterialComponents.Chip.Choice" />
@@ -158,9 +158,9 @@
                 android:layout_height="wrap_content"
                 android:text="Terça"
                 android:checkable="true"
-                android:textColor="#404CCF"
+                android:textColor="@color/chip_text_color_selector"
                 app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeColor="#404CCF"
+                app:chipStrokeColor="@color/volans_blue"
                 app:chipStrokeWidth="1dp"
                 app:chipCornerRadius="12dp"
                 style="@style/Widget.MaterialComponents.Chip.Choice" />
@@ -170,9 +170,9 @@
                 android:layout_height="wrap_content"
                 android:text="Quarta"
                 android:checkable="true"
-                android:textColor="#404CCF"
+                android:textColor="@color/chip_text_color_selector"
                 app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeColor="#404CCF"
+                app:chipStrokeColor="@color/volans_blue"
                 app:chipStrokeWidth="1dp"
                 app:chipCornerRadius="12dp"
                 style="@style/Widget.MaterialComponents.Chip.Choice" />
@@ -182,9 +182,9 @@
                 android:layout_height="wrap_content"
                 android:text="Quinta"
                 android:checkable="true"
-                android:textColor="#404CCF"
+                android:textColor="@color/chip_text_color_selector"
                 app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeColor="#404CCF"
+                app:chipStrokeColor="@color/volans_blue"
                 app:chipStrokeWidth="1dp"
                 app:chipCornerRadius="12dp"
                 style="@style/Widget.MaterialComponents.Chip.Choice" />
@@ -194,9 +194,9 @@
                 android:layout_height="wrap_content"
                 android:text="Sexta"
                 android:checkable="true"
-                android:textColor="#404CCF"
+                android:textColor="@color/chip_text_color_selector"
                 app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeColor="#404CCF"
+                app:chipStrokeColor="@color/volans_blue"
                 app:chipStrokeWidth="1dp"
                 app:chipCornerRadius="12dp"
                 style="@style/Widget.MaterialComponents.Chip.Choice" />
@@ -206,9 +206,9 @@
                 android:layout_height="wrap_content"
                 android:text="Sábado"
                 android:checkable="true"
-                android:textColor="#404CCF"
+                android:textColor="@color/chip_text_color_selector"
                 app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeColor="#404CCF"
+                app:chipStrokeColor="@color/volans_blue"
                 app:chipStrokeWidth="1dp"
                 app:chipCornerRadius="12dp"
                 style="@style/Widget.MaterialComponents.Chip.Choice" />
@@ -218,9 +218,9 @@
                 android:layout_height="wrap_content"
                 android:text="Domingo"
                 android:checkable="true"
-                android:textColor="#404CCF"
+                android:textColor="@color/chip_text_color_selector"
                 app:chipBackgroundColor="@color/chip_background_selector"
-                app:chipStrokeColor="#404CCF"
+                app:chipStrokeColor="@color/volans_blue"
                 app:chipStrokeWidth="1dp"
                 app:chipCornerRadius="12dp"
                 style="@style/Widget.MaterialComponents.Chip.Choice" />
@@ -243,13 +243,13 @@
             android:layout_marginEnd="10dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#F8FAFF">
+            app:cardBackgroundColor="@color/background_primary">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="🕐 Horário"
-                app:hintTextColor="#404CCF"
+                app:hintTextColor="@color/volans_blue"
                 app:boxBackgroundMode="none"
                 app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="0dp">
@@ -261,7 +261,7 @@
                     android:inputType="none"
                     android:focusable="false"
                     android:clickable="true"
-                    android:textColor="#1F2937"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:padding="16dp" />
 
@@ -276,13 +276,13 @@
             android:layout_marginStart="10dp"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:cardBackgroundColor="#F8FAFF">
+            app:cardBackgroundColor="@color/background_primary">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="📅 Data limite"
-                app:hintTextColor="#404CCF"
+                app:hintTextColor="@color/volans_blue"
                 app:boxBackgroundMode="none"
                 app:boxStrokeWidth="0dp"
                 app:boxStrokeWidthFocused="0dp">
@@ -294,7 +294,7 @@
                     android:inputType="none"
                     android:focusable="false"
                     android:clickable="true"
-                    android:textColor="#1F2937"
+                    android:textColor="@color/text_primary"
                     android:textSize="16sp"
                     android:padding="16dp" />
 
@@ -311,13 +311,13 @@
         android:layout_marginBottom="20dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="0dp"
-        app:cardBackgroundColor="#F8FAFF">
+        app:cardBackgroundColor="@color/background_primary">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="👨‍🏫 Professor (opcional)"
-            app:hintTextColor="#404CCF"
+            app:hintTextColor="@color/volans_blue"
             app:boxBackgroundMode="none"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="0dp">
@@ -327,7 +327,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:padding="16dp" />
 
@@ -335,7 +335,7 @@
 
     </androidx.cardview.widget.CardView>
 
-    <!-- Modalidade com design moderno -->
+    <!-- Modalidade com design moderno - CORRIGIDO -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -354,14 +354,14 @@
                 android:layout_height="32dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#E8F2FF">
+                app:cardBackgroundColor="@color/background_primary">
 
                 <ImageView
                     android:layout_width="16dp"
                     android:layout_height="16dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_school"
-                    app:tint="#404CCF" />
+                    app:tint="@color/volans_blue" />
 
             </androidx.cardview.widget.CardView>
 
@@ -370,12 +370,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:text="Modalidade"
-                android:textColor="#1F2937"
+                android:textColor="@color/text_primary"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
+        <!-- CORREÇÃO: Usando LinearLayout para manter o visual, mas com RadioGroup funcionando corretamente -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -388,46 +389,50 @@
                 android:layout_marginEnd="8dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:cardBackgroundColor="#F8FAFF">
+                app:cardBackgroundColor="@color/background_primary">
 
-                <RadioButton
-                    android:id="@+id/rbPresencial"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="🏫 Presencial"
-                    android:checked="true"
-                    android:buttonTint="#404CCF"
-                    android:textColor="#1F2937"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:padding="16dp" />
+                    android:orientation="vertical">
 
+                    <RadioGroup
+                        android:id="@+id/radioGroupModalidade"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:checkedButton="@+id/rbPresencial">
+
+                        <RadioButton
+                            android:id="@+id/rbPresencial"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="🏫 Presencial"
+                            android:checked="true"
+                            android:buttonTint="@color/volans_blue"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:padding="16dp"
+                            android:theme="@style/RadioButtonTheme" />
+
+                        <RadioButton
+                            android:id="@+id/rbEAD"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="💻 EAD"
+                            android:buttonTint="@color/volans_blue"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:padding="16dp"
+                            android:theme="@style/RadioButtonTheme" />
+                    </RadioGroup>
+                </LinearLayout>
             </androidx.cardview.widget.CardView>
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="#F8FAFF">
-
-                <RadioButton
-                    android:id="@+id/rbEAD"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="💻 EAD"
-                    android:buttonTint="#404CCF"
-                    android:textColor="#1F2937"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:padding="16dp" />
-
-            </androidx.cardview.widget.CardView>
-
         </LinearLayout>
-
     </LinearLayout>
 
     <!-- Botões com design premium -->
@@ -442,14 +447,14 @@
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:text="Cancelar"
-            android:textColor="#6B7280"
+            android:textColor="@color/text_secondary"
             android:textSize="16sp"
             android:textStyle="bold"
             android:layout_marginEnd="12dp"
             app:cornerRadius="16dp"
-            app:strokeColor="#E5E7EB"
+            app:strokeColor="@color/border"
             app:strokeWidth="1dp"
-            android:backgroundTint="#FFFFFF"
+            android:backgroundTint="@color/white"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
         <com.google.android.material.button.MaterialButton
@@ -457,13 +462,13 @@
             android:layout_width="wrap_content"
             android:layout_height="56dp"
             android:text="Criar Tarefa"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:backgroundTint="@drawable/button_gradient_background"
+            android:backgroundTint="@color/volans_blue"
             app:cornerRadius="16dp"
             app:icon="@drawable/ic_check"
-            app:iconTint="#FFFFFF"
+            app:iconTint="@color/white"
             android:elevation="4dp"
             style="@style/Widget.MaterialComponents.Button" />
 

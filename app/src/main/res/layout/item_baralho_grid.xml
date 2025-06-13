@@ -88,7 +88,7 @@
 
         </LinearLayout>
 
-        <!-- Botão de opções -->
+        <!-- Botão de opções - CORREÇÃO: Garantir que seja clicável -->
         <ImageButton
             android:id="@+id/btnOptions"
             android:layout_width="32dp"
@@ -98,7 +98,9 @@
             android:src="@drawable/ic_options"
             android:background="@drawable/circle_background_dark"
             android:contentDescription="Opções"
-            android:padding="4dp" />
+            android:padding="4dp"
+            android:clickable="true"
+            android:focusable="true" />
 
     </FrameLayout>
 

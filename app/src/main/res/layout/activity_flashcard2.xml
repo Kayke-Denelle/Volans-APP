@@ -45,7 +45,7 @@
                         android:layout_height="48dp"
                         app:cardCornerRadius="24dp"
                         app:cardBackgroundColor="@color/white"
-                        app:cardElevation="4dp"
+                        app:cardElevation="0.1dp"
                         android:clickable="true"
                         android:focusable="true"
                         android:foreground="?android:attr/selectableItemBackground">

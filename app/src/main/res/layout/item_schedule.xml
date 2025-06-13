@@ -2,12 +2,13 @@
 <androidx.cardview.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="280dp"
     android:layout_height="wrap_content"
-    android:layout_marginEnd="16dp"
-    app:cardCornerRadius="12dp"
-    app:cardBackgroundColor="#FFFFFF"
-    app:cardElevation="2dp">
+    android:layout_marginEnd="12dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#F9FAFB">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,137 +16,138 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header com dia e ícone -->
+        <!-- Cabeçalho com dia e hora -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
             android:layout_marginBottom="12dp">
 
-            <androidx.cardview.widget.CardView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                app:cardCornerRadius="16dp"
-                app:cardBackgroundColor="#E8E5FF"
-                app:cardElevation="0dp">
-
-                <TextView
-                    android:id="@+id/tvDay"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:text="Quinta"
-                    android:textColor="#5B4CF5"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:gravity="center" />
-
-            </androidx.cardview.widget.CardView>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/ic_schedule"
-                app:tint="#9CA3AF" />
-
-        </LinearLayout>
-
-        <!-- Nome do professor -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
-                android:src="@drawable/ic_perfil"
-                app:tint="#9CA3AF"
-                android:layout_marginEnd="8dp" />
-
+            <!-- Dia da semana em destaque -->
             <TextView
-                android:id="@+id/tvProfessor"
+                android:id="@+id/tvDay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Eliney Sabino"
-                android:textColor="#6B7280"
-                android:textSize="14sp" />
-
-        </LinearLayout>
-
-        <!-- Matéria (oculta para economizar espaço) -->
-        <TextView
-            android:id="@+id/tvSubject"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Startup: Final Project"
-            android:textColor="#1F2937"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"
-            android:visibility="gone" />
-
-        <!-- Modo e horário -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="12dp">
-
-            <androidx.cardview.widget.CardView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="8dp"
-                app:cardBackgroundColor="#5B4CF5"
-                app:cardElevation="0dp">
-
-                <TextView
-                    android:id="@+id/tvMode"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="EAD"
-                    android:textColor="#FFFFFF"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="4dp" />
-
-            </androidx.cardview.widget.CardView>
+                android:background="@drawable/day_badge_background"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                tools:text="Quinta" />
 
             <View
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
+            <!-- Horário -->
             <TextView
                 android:id="@+id/tvTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="17:10"
+                android:drawableStart="@drawable/ic_clock"
+                android:drawablePadding="4dp"
+                android:gravity="center_vertical"
                 android:textColor="#6B7280"
                 android:textSize="14sp"
-                android:visibility="gone" />
-
+                tools:text="19:00" />
         </LinearLayout>
 
-        <!-- Data de entrega -->
+        <!-- Título da tarefa -->
         <TextView
-            android:id="@+id/tvDeliveryDate"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvSubject"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="29/05 19:00"
-            android:textColor="#EF4444"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textColor="#1F2937"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:layout_marginBottom="8dp"
+            tools:text="Startup: Final Project" />
 
+        <!-- Professor -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <ImageView
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:src="@drawable/ic_person"
+                app:tint="@color/volans_blue"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/tvProfessor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#6B7280"
+                android:textSize="14sp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                tools:text="Eliney Sabino" />
+        </LinearLayout>
+
+        <!-- Linha divisória -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#E5E7EB"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Rodapé com modalidade e data de entrega -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Modalidade -->
+            <TextView
+                android:id="@+id/tvMode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/mode_badge_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:textColor="@color/volans_blue"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                tools:text="EAD" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Data de entrega -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="end">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Entrega"
+                    android:textColor="#6B7280"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvDeliveryDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/volans_blue"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    tools:text="29/05 19:00" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

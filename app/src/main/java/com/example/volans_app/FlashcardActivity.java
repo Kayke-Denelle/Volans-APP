@@ -39,6 +39,7 @@ import retrofit2.Response;
 public class FlashcardActivity extends AppCompatActivity implements
         FlashcardAdapter.OnItemClickListener, FlashcardAdapter.OnStartDragListener {
 
+    private static final String TAG = "FlashcardActivity";
     private EditText etPergunta, etResposta;
     private Button btnAdicionarFlashcard;
     private ImageView btnVoltar;
@@ -54,6 +55,7 @@ public class FlashcardActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate iniciado");
 
         // Configurar a barra de status ANTES de setContentView
         setupStatusBar();
@@ -67,12 +69,15 @@ public class FlashcardActivity extends AppCompatActivity implements
 
         // Pegando o ID do baralho da Intent
         baralhoId = getIntent().getStringExtra("baralhoId");
+        Log.d(TAG, "baralhoId recebido: " + baralhoId);
 
         // Carregar os flashcards ao iniciar
         carregarFlashcards();
     }
 
     private void setupStatusBar() {
+        Log.d(TAG, "Configurando barras de sistema");
+
         // Configurar a janela para desenhar atrás das barras do sistema
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -89,18 +94,17 @@ public class FlashcardActivity extends AppCompatActivity implements
                 );
             }
 
-            // Configurar barra de navegação para Android 8.1+
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                getWindow().setNavigationBarColor(0xFFF5F7FA); // #F5F7FA
+            // Configurar barra de navegação para SEMPRE ser preta
+            getWindow().setNavigationBarColor(Color.BLACK);
 
-                // Ícones escuros na barra de navegação
+            // Remover a flag de ícones claros na barra de navegação para garantir contraste
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 int flags = getWindow().getDecorView().getSystemUiVisibility();
-                flags |= View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR; // Remover esta flag
                 getWindow().getDecorView().setSystemUiVisibility(flags);
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                // Para Android 8.0, apenas definir a cor
-                getWindow().setNavigationBarColor(0xFFF5F7FA); // #F5F7FA
             }
+
+            Log.d(TAG, "Barra de navegação configurada para preto");
         }
     }
 
@@ -113,6 +117,8 @@ public class FlashcardActivity extends AppCompatActivity implements
         layoutEmptyState = findViewById(R.id.layoutEmptyState);
         tvBaralhoNome = findViewById(R.id.tvBaralhoNome);
         fabAddFlashcard = findViewById(R.id.fabAddFlashcard);
+
+        Log.d(TAG, "Views inicializadas");
     }
 
     private void setupRecyclerView() {
@@ -127,6 +133,8 @@ public class FlashcardActivity extends AppCompatActivity implements
         ItemTouchHelperCallback callback = new ItemTouchHelperCallback(adapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(rvFlashcards);
+
+        Log.d(TAG, "RecyclerView configurado");
     }
 
     private void setupClickListeners() {
@@ -148,6 +156,8 @@ public class FlashcardActivity extends AppCompatActivity implements
             animateButton(btnVoltar);
             voltarParaDashboard();
         });
+
+        Log.d(TAG, "Click listeners configurados");
     }
 
     // Implementação das interfaces do adapter
@@ -169,6 +179,7 @@ public class FlashcardActivity extends AppCompatActivity implements
 
     private void mostrarDialogoExclusao(int position) {
         Flashcard flashcard = lista.get(position);
+        Log.d(TAG, "Mostrando diálogo de exclusão para flashcard: " + flashcard.getPergunta());
 
         // Criar o diálogo customizado
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -243,7 +254,7 @@ public class FlashcardActivity extends AppCompatActivity implements
         Flashcard flashcard = lista.get(position);
         String token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
 
-        Log.d("FlashcardActivity", "Tentando excluir flashcard ID: " + flashcard.getBaralhoId());
+        Log.d(TAG, "Tentando excluir flashcard ID: " + flashcard.getBaralhoId());
 
         // Chamar a API para excluir o flashcard do servidor
         Call<Void> call = RetrofitClient.getApiService().excluirFlashcard(flashcard.getBaralhoId(), token);
@@ -251,7 +262,7 @@ public class FlashcardActivity extends AppCompatActivity implements
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
-                    Log.d("FlashcardActivity", "Flashcard excluído com sucesso no servidor");
+                    Log.d(TAG, "Flashcard excluído com sucesso no servidor");
 
                     // Remover da lista local apenas após confirmação do servidor
                     lista.remove(position);
@@ -261,10 +272,10 @@ public class FlashcardActivity extends AppCompatActivity implements
                     // Toast de sucesso
                     Toast.makeText(FlashcardActivity.this, "🗑️ Flashcard excluído com sucesso!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Log.e("FlashcardActivity", "Erro ao excluir flashcard. Código: " + response.code());
+                    Log.e(TAG, "Erro ao excluir flashcard. Código: " + response.code());
                     try {
                         String erro = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
-                        Log.e("FlashcardActivity", "Erro detalhado: " + erro);
+                        Log.e(TAG, "Erro detalhado: " + erro);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -274,7 +285,7 @@ public class FlashcardActivity extends AppCompatActivity implements
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
-                Log.e("FlashcardActivity", "Falha na requisição de exclusão: " + t.getMessage(), t);
+                Log.e(TAG, "Falha na requisição de exclusão: " + t.getMessage(), t);
                 Toast.makeText(FlashcardActivity.this, "❌ Falha na conexão. Tente novamente.", Toast.LENGTH_SHORT).show();
             }
         });
@@ -296,17 +307,17 @@ public class FlashcardActivity extends AppCompatActivity implements
 
     private void carregarFlashcards() {
         String token = "Bearer " + SharedPrefManager.getInstance(this).getToken();
-        Log.d("FlashcardActivity", "Token: " + token);
-        Log.d("FlashcardActivity", "Baralho ID: " + baralhoId);
+        Log.d(TAG, "Token: " + token);
+        Log.d(TAG, "Baralho ID: " + baralhoId);
 
         Call<List<Flashcard>> call = RetrofitClient.getApiService().getFlashcardsPorBaralho(baralhoId, token);
         call.enqueue(new Callback<List<Flashcard>>() {
             @Override
             public void onResponse(Call<List<Flashcard>> call, Response<List<Flashcard>> response) {
-                Log.d("FlashcardActivity", "Resposta recebida. Código: " + response.code());
+                Log.d(TAG, "Resposta recebida. Código: " + response.code());
 
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.d("FlashcardActivity", "Flashcards recebidos: " + response.body().size());
+                    Log.d(TAG, "Flashcards recebidos: " + response.body().size());
 
                     lista.clear();
                     lista.addAll(response.body());
@@ -315,7 +326,7 @@ public class FlashcardActivity extends AppCompatActivity implements
                 } else {
                     try {
                         String erro = response.errorBody() != null ? response.errorBody().string() : "Erro desconhecido";
-                        Log.e("FlashcardActivity", "Erro ao carregar flashcards: " + erro);
+                        Log.e(TAG, "Erro ao carregar flashcards: " + erro);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -325,7 +336,7 @@ public class FlashcardActivity extends AppCompatActivity implements
 
             @Override
             public void onFailure(Call<List<Flashcard>> call, Throwable t) {
-                Log.e("FlashcardActivity", "Falha na requisição: " + t.getMessage(), t);
+                Log.e(TAG, "Falha na requisição: " + t.getMessage(), t);
                 Toast.makeText(FlashcardActivity.this, "Erro ao carregar flashcards", Toast.LENGTH_SHORT).show();
             }
         });
@@ -425,5 +436,24 @@ public class FlashcardActivity extends AppCompatActivity implements
                             .start();
                 })
                 .start();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Garantir que a barra de navegação permaneça preta mesmo após retornar à atividade
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setNavigationBarColor(Color.BLACK);
+
+            // Remover a flag de ícones claros na barra de navegação
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                int flags = getWindow().getDecorView().getSystemUiVisibility();
+                flags &= ~View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+                getWindow().getDecorView().setSystemUiVisibility(flags);
+            }
+        }
+
+        Log.d(TAG, "onResume: Barra de navegação reconfigurada para preto");
     }
 }

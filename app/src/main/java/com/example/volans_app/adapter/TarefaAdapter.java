@@ -1,18 +1,14 @@
 package com.example.volans_app.adapter;
 
-import android.animation.ValueAnimator;
 import android.content.Context;
-import android.graphics.Paint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.volans_app.DTO.Tarefa;
@@ -21,358 +17,223 @@ import com.example.volans_app.R;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class TarefaAdapter extends RecyclerView.Adapter<TarefaAdapter.TarefaViewHolder> {
 
-    private List<Tarefa> listaTarefas;
-    private List<Tarefa> listaOriginal; // Para filtros
+    private List<Tarefa> tarefaList;
+    private List<Tarefa> tarefaListFull;
     private Context context;
     private OnTarefaClickListener listener;
 
-    public interface OnTarefaClickListener {
-        void onTarefaClick(Tarefa tarefa, int position);
-        void onTarefaDelete(Tarefa tarefa, int position);
-        void onTarefaEdit(Tarefa tarefa, int position);
-        void onTarefaToggleComplete(Tarefa tarefa, int position);
-    }
-
-    public TarefaAdapter(List<Tarefa> listaTarefas, Context context) {
-        this.listaTarefas = listaTarefas;
-        this.listaOriginal = new ArrayList<>(listaTarefas); // Cópia para filtros
+    public TarefaAdapter(List<Tarefa> tarefaList, Context context) {
+        this.tarefaList = tarefaList;
+        this.tarefaListFull = new ArrayList<>(tarefaList);
         this.context = context;
+
         if (context instanceof OnTarefaClickListener) {
             this.listener = (OnTarefaClickListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnTarefaClickListener");
         }
     }
 
     @NonNull
     @Override
     public TarefaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_tarefa, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tarefa, parent, false);
         return new TarefaViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull TarefaViewHolder holder, int position) {
-        Tarefa tarefa = listaTarefas.get(position);
+        Tarefa tarefa = tarefaList.get(position);
 
         // Configurar dados básicos
-        holder.tvTitulo.setText(tarefa.getTitulo());
-        holder.tvDiaSemana.setText(tarefa.getDiaSemana());
-        holder.tvHorario.setText(tarefa.getHorario());
+        holder.tvTituloTarefa.setText(tarefa.getTitulo());
+        holder.tvDetalhes.setText(tarefa.getDiaSemana() + " • " + tarefa.getHorario());
         holder.tvDataLimite.setText("Entrega: " + tarefa.getDataLimite());
+        holder.tvProfessor.setText(tarefa.getProfessor().isEmpty() ? "Sem professor" : tarefa.getProfessor());
+        holder.tvModalidade.setText(tarefa.getModalidade());
 
-        // Configurar checkbox de conclusão
-        if (holder.cbConcluida != null) {
-            holder.cbConcluida.setOnCheckedChangeListener(null); // Evitar loops
-            holder.cbConcluida.setChecked(tarefa.isConcluida());
-            holder.cbConcluida.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                tarefa.setConcluida(isChecked);
-                if (listener != null) {
-                    listener.onTarefaToggleComplete(tarefa, position);
+        // Configurar dias restantes
+        int diasRestantes = calcularDiasRestantes(tarefa.getDataLimite());
+        if (diasRestantes > 0) {
+            holder.tvDiasRestantes.setText(diasRestantes + " dias");
+            holder.tvDiasRestantes.setTextColor(context.getResources().getColor(R.color.white));
+            holder.tvDiasRestantes.setBackgroundResource(R.drawable.days_badge_background);
+            holder.tvDiasRestantes.setVisibility(View.VISIBLE);
+        } else if (diasRestantes == 0) {
+            holder.tvDiasRestantes.setText("Hoje");
+            holder.tvDiasRestantes.setTextColor(context.getResources().getColor(R.color.white));
+            holder.tvDiasRestantes.setBackgroundResource(R.drawable.today_badge_background);
+            holder.tvDiasRestantes.setVisibility(View.VISIBLE);
+        } else {
+            holder.tvDiasRestantes.setText("Atrasado");
+            holder.tvDiasRestantes.setTextColor(context.getResources().getColor(R.color.white));
+            holder.tvDiasRestantes.setBackgroundResource(R.drawable.overdue_badge_background);
+            holder.tvDiasRestantes.setVisibility(View.VISIBLE);
+        }
+
+        // Configurar status com cores mais legíveis
+        holder.checkBox.setChecked(tarefa.isConcluida());
+        if (tarefa.isConcluida()) {
+            holder.tvStatus.setText("Concluída");
+            holder.tvStatus.setTextColor(context.getResources().getColor(R.color.white));
+            holder.tvStatus.setBackgroundResource(R.drawable.success_badge_background);
+        } else {
+            if (diasRestantes < 0) {
+                holder.tvStatus.setText("Atrasada");
+                holder.tvStatus.setTextColor(context.getResources().getColor(R.color.white));
+                holder.tvStatus.setBackgroundResource(R.drawable.overdue_badge_background);
+            } else {
+                holder.tvStatus.setText("Pendente");
+                holder.tvStatus.setTextColor(context.getResources().getColor(R.color.white));
+                holder.tvStatus.setBackgroundResource(R.drawable.status_badge_background);
+            }
+        }
+
+        // Configurar listeners
+        holder.checkBox.setOnClickListener(v -> {
+            boolean isChecked = holder.checkBox.isChecked();
+            tarefa.setStatus(isChecked ? "Concluída" : "Pendente");
+
+            // Atualizar UI
+            if (isChecked) {
+                holder.tvStatus.setText("Concluída");
+                holder.tvStatus.setTextColor(context.getResources().getColor(R.color.white));
+                holder.tvStatus.setBackgroundResource(R.drawable.success_badge_background);
+            } else {
+                int dias = calcularDiasRestantes(tarefa.getDataLimite());
+                if (dias < 0) {
+                    holder.tvStatus.setText("Atrasada");
+                    holder.tvStatus.setTextColor(context.getResources().getColor(R.color.white));
+                    holder.tvStatus.setBackgroundResource(R.drawable.overdue_badge_background);
+                } else {
+                    holder.tvStatus.setText("Pendente");
+                    holder.tvStatus.setTextColor(context.getResources().getColor(R.color.white));
+                    holder.tvStatus.setBackgroundResource(R.drawable.status_badge_background);
                 }
-                updateTaskAppearance(holder, tarefa);
-                animateCheckboxChange(holder.cbConcluida, isChecked);
-            });
-        }
+            }
 
-        // Configurar modalidade
-        if (tarefa.getModalidade().equals("Presencial")) {
-            holder.ivModalidade.setImageResource(R.drawable.ic_presencial);
-            holder.tvModalidade.setText("Presencial");
-            holder.tvModalidade.setTextColor(ContextCompat.getColor(context, R.color.green_500));
-        } else {
-            holder.ivModalidade.setImageResource(R.drawable.ic_school);
-            holder.tvModalidade.setText("EAD");
-            holder.tvModalidade.setTextColor(ContextCompat.getColor(context, R.color.blue_500));
-        }
-
-        // Mostrar professor se disponível
-        if (tarefa.getProfessor() != null && !tarefa.getProfessor().isEmpty()) {
-            holder.tvProfessor.setText(tarefa.getProfessor());
-            holder.tvProfessor.setVisibility(View.VISIBLE);
-        } else {
-            holder.tvProfessor.setVisibility(View.GONE);
-        }
-
-        // Verificar se a tarefa está atrasada e configurar indicadores visuais
-        boolean isOverdue = isTaskOverdue(tarefa);
-        configurarIndicadoresVisuais(holder, tarefa, isOverdue);
-
-        // Atualizar aparência baseada no status
-        updateTaskAppearance(holder, tarefa);
-
-        // Click listeners com animações
-        holder.itemView.setOnClickListener(v -> {
-            animateItemClick(v);
             if (listener != null) {
-                listener.onTarefaClick(tarefa, position);
+                listener.onTarefaToggleComplete(tarefa, holder.getAdapterPosition());
             }
         });
 
-        if (holder.ivEdit != null) {
-            holder.ivEdit.setOnClickListener(v -> {
-                animateActionButton(v);
-                if (listener != null) {
-                    listener.onTarefaEdit(tarefa, position);
-                }
-            });
-        }
-
-        if (holder.ivDelete != null) {
-            holder.ivDelete.setOnClickListener(v -> {
-                animateActionButton(v);
-                if (listener != null) {
-                    listener.onTarefaDelete(tarefa, position);
-                }
-            });
-        }
-
-        // Animação de entrada
-        animateItemEntry(holder.itemView, position);
-    }
-
-    private void configurarIndicadoresVisuais(TarefaViewHolder holder, Tarefa tarefa, boolean isOverdue) {
-        if (isOverdue && !tarefa.isConcluida()) {
-            // Tarefa atrasada
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.red_light));
-            holder.tvDataLimite.setTextColor(ContextCompat.getColor(context, R.color.red_500));
-
-            // Adicionar indicador de prioridade se existir
-            if (holder.ivPrioridade != null) {
-                holder.ivPrioridade.setVisibility(View.VISIBLE);
-                holder.ivPrioridade.setImageResource(R.drawable.ic_warning);
-                holder.ivPrioridade.setColorFilter(ContextCompat.getColor(context, R.color.red_500));
+        holder.btnEditTarefa.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTarefaEdit(tarefa, holder.getAdapterPosition());
             }
-        } else if (tarefa.isConcluida()) {
-            // Tarefa concluída
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.green_light));
-            holder.tvDataLimite.setTextColor(ContextCompat.getColor(context, R.color.gray_500));
+        });
 
-            if (holder.ivPrioridade != null) {
-                holder.ivPrioridade.setVisibility(View.VISIBLE);
-                holder.ivPrioridade.setImageResource(R.drawable.ic_check);
-                holder.ivPrioridade.setColorFilter(ContextCompat.getColor(context, R.color.green_500));
+        holder.btnDeleteTarefa.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTarefaDelete(tarefa, holder.getAdapterPosition());
             }
-        } else {
-            // Tarefa normal
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(context, android.R.color.white));
-            holder.tvDataLimite.setTextColor(ContextCompat.getColor(context, R.color.red_500));
+        });
 
-            if (holder.ivPrioridade != null) {
-                holder.ivPrioridade.setVisibility(View.GONE);
+        // Configurar clique no item
+        holder.itemView.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onTarefaClick(tarefa, holder.getAdapterPosition());
             }
-        }
+        });
     }
 
-    private void updateTaskAppearance(TarefaViewHolder holder, Tarefa tarefa) {
-        if (tarefa.isConcluida()) {
-            // Tarefa concluída - aparência "riscada" e opaca
-            holder.tvTitulo.setPaintFlags(holder.tvTitulo.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            setViewsAlpha(holder, 0.6f);
-        } else {
-            // Tarefa pendente - aparência normal
-            holder.tvTitulo.setPaintFlags(holder.tvTitulo.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
-            setViewsAlpha(holder, 1.0f);
-        }
-    }
-
-    private void setViewsAlpha(TarefaViewHolder holder, float alpha) {
-        holder.tvTitulo.setAlpha(alpha);
-        holder.tvDiaSemana.setAlpha(alpha);
-        holder.tvHorario.setAlpha(alpha);
-        holder.tvDataLimite.setAlpha(alpha);
-        holder.tvModalidade.setAlpha(alpha);
-        holder.tvProfessor.setAlpha(alpha);
-        holder.ivModalidade.setAlpha(alpha);
-    }
-
-    private boolean isTaskOverdue(Tarefa tarefa) {
+    private int calcularDiasRestantes(String dataLimite) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date dataLimite = sdf.parse(tarefa.getDataLimite());
-            Date hoje = new Date();
+            Date dataLimiteDate = sdf.parse(dataLimite);
+            Date hoje = Calendar.getInstance().getTime();
 
-            // Comparar apenas as datas, ignorando o horário
-            SimpleDateFormat dateOnly = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date dataLimiteOnly = dateOnly.parse(dateOnly.format(dataLimite));
-            Date hojeOnly = dateOnly.parse(dateOnly.format(hoje));
+            // Remover horas, minutos, segundos
+            Calendar cal1 = Calendar.getInstance();
+            cal1.setTime(hoje);
+            cal1.set(Calendar.HOUR_OF_DAY, 0);
+            cal1.set(Calendar.MINUTE, 0);
+            cal1.set(Calendar.SECOND, 0);
+            cal1.set(Calendar.MILLISECOND, 0);
+            hoje = cal1.getTime();
 
-            return hojeOnly.after(dataLimiteOnly);
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(dataLimiteDate);
+            cal2.set(Calendar.HOUR_OF_DAY, 0);
+            cal2.set(Calendar.MINUTE, 0);
+            cal2.set(Calendar.SECOND, 0);
+            cal2.set(Calendar.MILLISECOND, 0);
+            dataLimiteDate = cal2.getTime();
+
+            long diff = dataLimiteDate.getTime() - hoje.getTime();
+            return (int) TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         } catch (ParseException e) {
-            return false;
-        }
-    }
-
-    // Animações melhoradas
-    private void animateItemEntry(View view, int position) {
-        view.setAlpha(0f);
-        view.setTranslationY(50f);
-        view.setScaleX(0.9f);
-        view.setScaleY(0.9f);
-
-        ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-        animator.setDuration(400);
-        animator.setStartDelay(position * 80); // Delay escalonado
-        animator.addUpdateListener(animation -> {
-            float value = (float) animation.getAnimatedValue();
-            view.setAlpha(value);
-            view.setTranslationY(50f * (1f - value));
-            view.setScaleX(0.9f + (0.1f * value));
-            view.setScaleY(0.9f + (0.1f * value));
-        });
-        animator.start();
-    }
-
-    private void animateItemClick(View view) {
-        view.animate()
-                .scaleX(0.95f)
-                .scaleY(0.95f)
-                .setDuration(100)
-                .withEndAction(() -> {
-                    view.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .setDuration(100)
-                            .start();
-                })
-                .start();
-    }
-
-    private void animateActionButton(View view) {
-        view.animate()
-                .scaleX(0.8f)
-                .scaleY(0.8f)
-                .setDuration(150)
-                .withEndAction(() -> {
-                    view.animate()
-                            .scaleX(1.0f)
-                            .scaleY(1.0f)
-                            .setDuration(150)
-                            .start();
-                })
-                .start();
-    }
-
-    private void animateCheckboxChange(CheckBox checkBox, boolean isChecked) {
-        if (isChecked) {
-            checkBox.animate()
-                    .scaleX(1.2f)
-                    .scaleY(1.2f)
-                    .setDuration(200)
-                    .withEndAction(() -> {
-                        checkBox.animate()
-                                .scaleX(1.0f)
-                                .scaleY(1.0f)
-                                .setDuration(200)
-                                .start();
-                    })
-                    .start();
+            e.printStackTrace();
+            return 0;
         }
     }
 
     @Override
     public int getItemCount() {
-        return listaTarefas.size();
+        return tarefaList.size();
     }
 
-    public void removeTarefa(int position) {
-        if (position >= 0 && position < listaTarefas.size()) {
-            Tarefa tarefaRemovida = listaTarefas.get(position);
-            listaTarefas.remove(position);
-            listaOriginal.remove(tarefaRemovida);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, listaTarefas.size());
-        }
-    }
-
-    public void updateTarefa(int position, Tarefa tarefaAtualizada) {
-        if (position >= 0 && position < listaTarefas.size()) {
-            listaTarefas.set(position, tarefaAtualizada);
-            // Atualizar também na lista original
-            int originalIndex = listaOriginal.indexOf(listaTarefas.get(position));
-            if (originalIndex != -1) {
-                listaOriginal.set(originalIndex, tarefaAtualizada);
-            }
-            notifyItemChanged(position);
-        }
-    }
-
-    public void addTarefa(Tarefa novaTarefa) {
-        listaTarefas.add(novaTarefa);
-        listaOriginal.add(novaTarefa);
-        notifyItemInserted(listaTarefas.size() - 1);
-    }
-
-    // Métodos para filtros melhorados
     public void filterByStatus(String status) {
-        listaTarefas.clear();
+        tarefaList = new ArrayList<>(tarefaListFull);
 
-        switch (status) {
-            case "Todas":
-                listaTarefas.addAll(listaOriginal);
-                break;
-            case "Pendentes":
-                for (Tarefa tarefa : listaOriginal) {
-                    if (!tarefa.isConcluida()) {
-                        listaTarefas.add(tarefa);
-                    }
-                }
-                break;
-            case "Concluídas":
-                for (Tarefa tarefa : listaOriginal) {
-                    if (tarefa.isConcluida()) {
-                        listaTarefas.add(tarefa);
-                    }
-                }
-                break;
-            case "Atrasadas":
-                for (Tarefa tarefa : listaOriginal) {
-                    if (!tarefa.isConcluida() && isTaskOverdue(tarefa)) {
-                        listaTarefas.add(tarefa);
-                    }
-                }
-                break;
+        if (!status.equals("Todas")) {
+            if (status.equals("Pendentes")) {
+                tarefaList = tarefaListFull.stream()
+                        .filter(tarefa -> !tarefa.isConcluida())
+                        .collect(Collectors.toList());
+            } else if (status.equals("Concluídas")) {
+                tarefaList = tarefaListFull.stream()
+                        .filter(Tarefa::isConcluida)
+                        .collect(Collectors.toList());
+            } else if (status.equals("Atrasadas")) {
+                tarefaList = tarefaListFull.stream()
+                        .filter(tarefa -> !tarefa.isConcluida() && calcularDiasRestantes(tarefa.getDataLimite()) < 0)
+                        .collect(Collectors.toList());
+            }
         }
 
         notifyDataSetChanged();
     }
 
-    public void updateOriginalList(List<Tarefa> novaLista) {
-        this.listaOriginal.clear();
-        this.listaOriginal.addAll(novaLista);
-        this.listaTarefas.clear();
-        this.listaTarefas.addAll(novaLista);
+    public void updateTarefaList(List<Tarefa> novaLista) {
+        this.tarefaList = novaLista;
+        this.tarefaListFull = new ArrayList<>(novaLista);
         notifyDataSetChanged();
     }
 
     public static class TarefaViewHolder extends RecyclerView.ViewHolder {
-        CardView cardView;
-        CheckBox cbConcluida;
-        TextView tvTitulo, tvDiaSemana, tvHorario, tvDataLimite, tvModalidade, tvProfessor;
-        ImageView ivModalidade, ivEdit, ivDelete, ivPrioridade;
+        CheckBox checkBox;
+        TextView tvTituloTarefa, tvDetalhes, tvStatus, tvDataLimite, tvDiasRestantes, tvProfessor, tvModalidade;
+        ImageButton btnEditTarefa, btnDeleteTarefa;
 
         public TarefaViewHolder(@NonNull View itemView) {
             super(itemView);
-
-            // Views obrigatórias (baseadas no item_tarefa.xml original)
-            cardView = (CardView) itemView;
-            tvTitulo = itemView.findViewById(R.id.tvTitulo);
-            tvDiaSemana = itemView.findViewById(R.id.tvDiaSemana);
-            tvHorario = itemView.findViewById(R.id.tvHorario);
+            checkBox = itemView.findViewById(R.id.checkBoxTarefa);
+            tvTituloTarefa = itemView.findViewById(R.id.tvTituloTarefa);
+            tvDetalhes = itemView.findViewById(R.id.tvDetalhes);
+            tvStatus = itemView.findViewById(R.id.tvStatus);
             tvDataLimite = itemView.findViewById(R.id.tvDataLimite);
-            tvModalidade = itemView.findViewById(R.id.tvModalidade);
+            tvDiasRestantes = itemView.findViewById(R.id.tvDiasRestantes);
             tvProfessor = itemView.findViewById(R.id.tvProfessor);
-            ivModalidade = itemView.findViewById(R.id.ivModalidade);
-            ivDelete = itemView.findViewById(R.id.ivDelete);
-
-            // Views opcionais (podem não existir em todos os layouts)
-            cbConcluida = itemView.findViewById(R.id.cbConcluida);
-            ivEdit = itemView.findViewById(R.id.ivEdit);
-            ivPrioridade = itemView.findViewById(R.id.ivPrioridade);
+            tvModalidade = itemView.findViewById(R.id.tvModalidade);
+            btnEditTarefa = itemView.findViewById(R.id.btnEditTarefa);
+            btnDeleteTarefa = itemView.findViewById(R.id.btnDeleteTarefa);
         }
+    }
+
+    public interface OnTarefaClickListener {
+        void onTarefaClick(Tarefa tarefa, int position);
+        void onTarefaDelete(Tarefa tarefa, int position);
+        void onTarefaEdit(Tarefa tarefa, int position);
+        void onTarefaToggleComplete(Tarefa tarefa, int position);
     }
 }
