@@ -4,6 +4,7 @@ import com.example.volans_app.DTO.Baralho;
 import com.example.volans_app.DTO.Flashcard;
 import com.example.volans_app.DTO.QuestaoQuiz;
 import com.example.volans_app.DTO.QuizModel;
+import com.example.volans_app.DTO.RegistroRevisao;
 import com.example.volans_app.DTO.ResultadoQuiz;
 
 import java.util.List;
@@ -68,6 +69,8 @@ public interface ApiService {
             @Path("baralhoId") String baralhoId
     );
 
+
+
     // Buscar quiz por ID
     @GET("api/quizzes/{quizId}")
     Call<QuizModel> buscarQuiz(
@@ -110,10 +113,11 @@ public interface ApiService {
             @Header("Authorization") String token
     );
 
-    /**
-     * Deletar imagem de um baralho
-     * Remove a imagem personalizada e volta para o padrão
-     */
+
+    @GET("api/quizzes/historico/mensal")
+    Call<List<RegistroRevisao>> getRevisoes(@Header("Authorization") String token);
+
+
     @DELETE("api/baralhos/{id}/imagem")
     Call<ResponseBody> deletarImagemBaralho(
             @Path("id") String baralhoId,

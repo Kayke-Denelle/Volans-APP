@@ -38,11 +38,16 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.volans_app.DTO.RegistroRevisao;
 import com.example.volans_app.api.ApiService;
 import com.example.volans_app.api.RetrofitClient;
 import com.example.volans_app.utils.SharedPrefManager;
+import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -75,6 +80,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
     private ApiService apiService;
     private String token;
     private LineChart lineChart;
+    private BarChart barChart;
 
     // Chatbot
     private WebView webView;
@@ -214,6 +220,9 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         setupStatusBar();
         setContentView(R.layout.activity_dashboard);
 
+        barChart = findViewById(R.id.BarChartRevisoes);
+
+
         initializeViews();
         setupDrawer();
         setupProfileImage();
@@ -223,8 +232,8 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         setupSchedule();
         setupUserData();
         carregarQuantidades();
-        configurarGraficoLinha();
         loadScheduleData();
+        carregarDadosDoGrafico();
     }
 
     private void setupStatusBar() {
@@ -241,7 +250,6 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         tvQuantidadeFlashcards = findViewById(R.id.tvQuantidadeFlashcards);
         tvNomeUsuario = findViewById(R.id.tvNomeUsuario);
         decorativeLine = findViewById(R.id.decorativeLine);
-        lineChart = findViewById(R.id.lineChartRevisoes);
         quickActionStudy = findViewById(R.id.quickActionStudy);
         quickActionCreate = findViewById(R.id.quickActionCreate);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -251,6 +259,7 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         chatContainer = findViewById(R.id.chat_container);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         rvSchedule = findViewById(R.id.rvSchedule);
+        barChart = findViewById(R.id.BarChartRevisoes);
 
         View headerView = navigationView.getHeaderView(0);
         if (headerView != null) {
@@ -732,45 +741,77 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         animator.start();
     }
 
-    private void configurarGraficoLinha() {
-        List<Entry> entries = new ArrayList<>();
-        entries.add(new Entry(0f, 4f));
-        entries.add(new Entry(1f, 7f));
-        entries.add(new Entry(2f, 3f));
-        entries.add(new Entry(3f, 6f));
-        entries.add(new Entry(4f, 8f));
+    private void carregarDadosDoGrafico() {
+        ApiService apiService = RetrofitClient.getRetrofitInstance().create(ApiService.class);
 
-        LineDataSet dataSet = new LineDataSet(entries, "");
+        Call<List<RegistroRevisao>> call = apiService.getRevisoes(token);
 
+        call.enqueue(new Callback<List<RegistroRevisao>>() {
+            @Override
+            public void onResponse(Call<List<RegistroRevisao>> call, Response<List<RegistroRevisao>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<RegistroRevisao> revisoes = response.body();
+
+                    Log.d(TAG, "Revisoes recebidas: " + revisoes.size());
+
+                    if (revisoes.isEmpty()) {
+                        Log.d(TAG, "Nenhum dado para mostrar no gráfico");
+                        Toast.makeText(getApplicationContext(), "Nenhum dado para mostrar", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    List<Integer> dados = new ArrayList<>();
+                    List<String> labels = new ArrayList<>();
+
+                    for (RegistroRevisao r : revisoes) {
+                        dados.add(r.getQuantidade());
+                        labels.add(r.getData().substring(5)); // Pega MM-dd do formato yyyy-MM-dd
+                    }
+
+                    configurarGraficoBarra(dados, labels);
+                } else {
+                    Log.e(TAG, "Falha na resposta da API. Código: " + response.code());
+                    Toast.makeText(getApplicationContext(), "Erro ao carregar dados: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<RegistroRevisao>> call, Throwable t) {
+                Log.e(TAG, "Erro na requisição: " + t.getMessage());
+                Toast.makeText(getApplicationContext(), "Erro: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void configurarGraficoBarra(List<Integer> dados, List<String> labels) {
+        List<BarEntry> entries = new ArrayList<>();
+
+        for (int i = 0; i < dados.size(); i++) {
+            entries.add(new BarEntry(i, dados.get(i)));
+        }
+
+        BarDataSet dataSet = new BarDataSet(entries, "Quantidade");
         dataSet.setColor(Color.parseColor("#5B4CF5"));
-        dataSet.setCircleColor(Color.parseColor("#5B4CF5"));
-        dataSet.setLineWidth(4f);
-        dataSet.setCircleRadius(8f);
-        dataSet.setDrawCircleHole(true);
-        dataSet.setCircleHoleColor(Color.parseColor("#FFFFFF"));
-        dataSet.setCircleHoleRadius(4f);
-        dataSet.setValueTextColor(Color.TRANSPARENT);
-        dataSet.setDrawFilled(true);
-        dataSet.setFillColor(Color.parseColor("#5B4CF5"));
-        dataSet.setFillAlpha(30);
+        dataSet.setValueTextColor(Color.BLACK);
+        dataSet.setValueTextSize(12f);
 
-        dataSet.setMode(LineDataSet.Mode.CUBIC_BEZIER);
-        dataSet.setCubicIntensity(0.2f);
+        BarData barData = new BarData(dataSet);
+        barData.setBarWidth(0.9f); // largura da barra
 
-        LineData lineData = new LineData(dataSet);
-        lineChart.setData(lineData);
+        barChart.setData(barData);
+        barChart.setFitBars(true); // para ajustar o eixo X às barras
 
-        lineChart.getDescription().setEnabled(false);
-        lineChart.setDrawGridBackground(false);
-        lineChart.setBackgroundColor(Color.TRANSPARENT);
-        lineChart.setTouchEnabled(true);
-        lineChart.setDragEnabled(true);
-        lineChart.setScaleEnabled(false);
-        lineChart.setPinchZoom(false);
-        lineChart.setDrawBorders(false);
+        barChart.getDescription().setEnabled(false);
+        barChart.setDrawGridBackground(false);
+        barChart.setBackgroundColor(Color.TRANSPARENT);
+        barChart.setTouchEnabled(true);
+        barChart.setDragEnabled(true);
+        barChart.setScaleEnabled(false);
+        barChart.setPinchZoom(false);
+        barChart.setDrawBorders(false);
 
-        XAxis xAxis = lineChart.getXAxis();
-        final String[] labels = new String[]{"S1", "S2", "S3", "S4", "S5"};
+        XAxis xAxis = barChart.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(labels));
         xAxis.setGranularity(1f);
         xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
@@ -779,22 +820,25 @@ public class DashboardActivity extends AppCompatActivity implements NavigationVi
         xAxis.setDrawGridLines(false);
         xAxis.setDrawAxisLine(false);
 
-        lineChart.getAxisLeft().setTextColor(Color.parseColor("#6B7280"));
-        lineChart.getAxisLeft().setTextSize(12f);
-        lineChart.getAxisLeft().setDrawGridLines(true);
-        lineChart.getAxisLeft().setGridColor(Color.parseColor("#F3F4F6"));
-        lineChart.getAxisLeft().setDrawAxisLine(false);
+        barChart.getAxisLeft().setTextColor(Color.parseColor("#6B7280"));
+        barChart.getAxisLeft().setTextSize(12f);
+        barChart.getAxisLeft().setDrawGridLines(true);
+        barChart.getAxisLeft().setGridColor(Color.parseColor("#F3F4F6"));
+        barChart.getAxisLeft().setDrawAxisLine(false);
 
-        lineChart.getAxisRight().setEnabled(false);
-        lineChart.getLegend().setEnabled(false);
+        barChart.getAxisRight().setEnabled(false);
+        barChart.getLegend().setEnabled(false);
 
-        lineChart.animateX(1500);
-        lineChart.invalidate();
+        barChart.animateY(1500);
+        barChart.invalidate();
     }
+
+
 
     @Override
     protected void onResume() {
         super.onResume();
+        carregarDadosDoGrafico();
         if (bottomNavigationView != null) {
             bottomNavigationView.setSelectedItemId(R.id.nav_dashboard);
         }
